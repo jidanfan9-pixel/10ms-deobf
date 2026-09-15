@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict');
-const { deobfuscate, formatLua, detectAdvancedObfuscation } = require('../deobf');
+const { deobfuscate, formatLua, detectAdvancedObfuscation, analyzeVMControlFlow } = require('../deobf');
 
 const cases = [
   {
@@ -27,6 +27,9 @@ for (const test of cases) {
 }
 
 assert.equal(deobfuscate('').success, false);
+const plain = deobfuscate('print("78")');
+assert.equal(plain.deobfuscated, 'print("78")');
+assert.equal(plain.report.outputBytes, plain.report.inputBytes);
 const advanced = detectAdvancedObfuscation(`
   local constants = { "QWxhZGRpbjpvcGVuIHNlc2FtZQ==", "0xdeadbeef" }
   local state = 1
@@ -41,4 +44,7 @@ const advanced = detectAdvancedObfuscation(`
 for (const type of ['constant-array', 'dynamic-goto', 'dynamic-string-decryption', 'vm-based-execution']) {
   assert.ok(advanced.some(item => item.type === type), `detects ${type}`);
 }
+const flow = analyzeVMControlFlow('local state=1; if state == 1 then state=2 end; if state == 2 then state=3 end');
+assert.equal(flow.detected, true);
+assert.deepEqual(flow.states, [1, 2]);
 console.log(`Passed ${cases.length + 1} deobfuscator tests`);

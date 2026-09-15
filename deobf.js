@@ -276,6 +276,30 @@ function detectAdvancedObfuscation(code) {
   return patterns;
 }
 
+function analyzeVMControlFlow(code) {
+  const candidates = [...code.matchAll(/\b([A-Za-z_]\w*)\s*==\s*(-?\d+)\b/g)];
+  const stateVar = candidates.length ? candidates[0][1] : null;
+  if (!stateVar) return { detected: false, blocks: [], edges: [] };
+
+  const states = [...new Set(candidates.map(([, , state]) => Number(state)))];
+  const edges = [];
+  const assignment = new RegExp(`\\b${escapeRegExp(stateVar)}\\s*=\\s*(-?\\d+)`, 'g');
+  for (const match of code.matchAll(assignment)) {
+    const next = Number(match[1]);
+    const before = code.slice(Math.max(0, match.index - 180), match.index);
+    const from = [...before.matchAll(new RegExp(`\\b${escapeRegExp(stateVar)}\\s*==\\s*(-?\\d+)`, 'g'))].pop();
+    edges.push({ from: from ? Number(from[1]) : null, to: next });
+  }
+
+  return {
+    detected: states.length >= 2 && edges.length >= 1,
+    stateVariable: stateVar,
+    states: states.sort((a, b) => a - b),
+    blocks: states.map(state => ({ state, condition: `${stateVar} == ${state}` })),
+    edges: edges.slice(0, 100)
+  };
+}
+
 /* ═══════════════════════════════════════════════
  *  ⑥ 字符串表提取
  * ═══════════════════════════════════════════════ */
@@ -481,6 +505,8 @@ function deobfuscate(source) {
     {
       const advanced = detectAdvancedObfuscation(code);
       if (advanced.length) report.hints.advanced = advanced;
+      const vmFlow = analyzeVMControlFlow(code);
+      if (vmFlow.detected) report.hints.vmControlFlow = vmFlow;
       report.phases.push({ name: '高级混淆模式检测', changed: advanced.length });
     }
 
@@ -564,4 +590,4 @@ function deobfuscate(source) {
   }
 }
 
-module.exports = { deobfuscate, decodeEscapes, formatLua, detectAdvancedObfuscation };
+module.exports = { deobfuscate, decodeEscapes, formatLua, detectAdvancedObfuscation, analyzeVMControlFlow };
