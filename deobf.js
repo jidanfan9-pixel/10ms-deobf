@@ -342,6 +342,24 @@ function analyzeObfuscationLayers(source, output) {
   };
 }
 
+function createTracePlan(code) {
+  const hooks = [];
+  const add = (target, purpose, risk) => hooks.push({ target, purpose, risk, action: 'record-only' });
+  if (/\bloadstring\s*\(/i.test(code)) add('loadstring', '记录动态编译输入，不执行结果', 'critical');
+  if (/\bload\s*\(/i.test(code)) add('load', '记录动态加载输入和环境参数', 'critical');
+  if (/\bgetfenv\s*\(|\b_ENV\b/i.test(code)) add('environment', '记录运行环境访问，不注入真实全局表', 'high');
+  if (/\bsetmetatable\s*\(|\bgetmetatable\s*\(/i.test(code)) add('metatable', '记录元表读写和调用链', 'high');
+  if (/\bstring\.(?:char|byte|sub|gsub)\s*\(/i.test(code)) add('string-decoder', '记录字符串解码函数的输入/输出摘要', 'medium');
+  if (/\btable\.concat\s*\(|\btable\.insert\s*\(/i.test(code)) add('table-builder', '记录常量池重组顺序', 'medium');
+  if (/\b(?:print|warn|error)\s*\(/i.test(code)) add('output', '捕获输出调用参数作为行为线索', 'low');
+  const entrypoints = [...code.matchAll(/\b(?:return|function)\s*[^\n]{0,120}/gi)].slice(0, 20).map(match => match[0].trim());
+  return {
+    mode: 'safe-static-trace-plan', executable: false, hooks, entrypoints,
+    warnings: ['此计划只描述可审计的记录点，不会在服务器或浏览器执行未知 Lua。', '动态解密应在隔离、无网络、无文件写入的 Lua 沙箱中逐项记录并回放。'],
+    recommendedOrder: ['string-decoder', 'table-builder', 'environment', 'loadstring', 'load', 'output'].filter(target => hooks.some(hook => hook.target === target))
+  };
+}
+
 /* ═══════════════════════════════════════════════
  *  ⑥ 字符串表提取
  * ═══════════════════════════════════════════════ */
@@ -640,6 +658,7 @@ function deobfuscate(source) {
 
     report.outputBytes = code.length;
     report.progress = analyzeObfuscationLayers(source, code);
+    report.tracePlan = createTracePlan(source);
 
     // 生成总结
     const changedPhases = report.phases.filter(p => p.changed).map(p => p.name);
@@ -671,4 +690,4 @@ function deobfuscate(source) {
   }
 }
 
-module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeObfuscationLayers };
+module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeObfuscationLayers, createTracePlan };

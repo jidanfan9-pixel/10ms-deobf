@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict');
-const { deobfuscate, formatLua, foldNumericConstants, detectAdvancedObfuscation, analyzeVMControlFlow } = require('../deobf');
+const { deobfuscate, formatLua, foldNumericConstants, detectAdvancedObfuscation, analyzeVMControlFlow, createTracePlan } = require('../deobf');
 const fs = require('node:fs');
 
 const cases = [
@@ -59,4 +59,7 @@ assert.equal(base64.hints.advanced.some(item => item.type === 'dynamic-string-de
 assert.ok(base64.report.progress);
 assert.equal(base64.report.progress.inputBytes, base64.report.inputBytes);
 assert.ok(Array.isArray(base64.report.progress.remainingLayers));
+const trace = createTracePlan('local x = string.char(65); return loadstring(x)');
+assert.equal(trace.executable, false);
+assert.deepEqual(trace.recommendedOrder, ['string-decoder', 'loadstring']);
 console.log(`Passed ${cases.length + 1} deobfuscator tests`);
