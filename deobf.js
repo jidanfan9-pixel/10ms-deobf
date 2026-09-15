@@ -444,6 +444,20 @@ function findCleanupSuggestions(code) {
   return suggestions;
 }
 
+function compareKnownSource(result, expected) {
+  const normalize = value => String(value || '').replace(/\r\n/g, '\n').replace(/[ \t]+/g, ' ').trim();
+  const actual = normalize(result && result.deobfuscated);
+  const target = normalize(expected);
+  return {
+    matched: actual === target,
+    expected: target,
+    actual,
+    note: actual === target
+      ? '静态输出与已知原始源码一致'
+      : '静态分析尚未证明与已知原始源码一致；不要把字符缩减当作完整还原'
+  };
+}
+
 /* ═══════════════════════════════════════════════
  *  ⑥ 字符串表提取
  * ═══════════════════════════════════════════════ */
@@ -790,4 +804,4 @@ function deobfuscate(source) {
   }
 }
 
-module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, evaluateConstantNumber, foldConstantPools, simplifyLuaStructures, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeObfuscationLayers, createTracePlan, findCleanupSuggestions };
+module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, evaluateConstantNumber, foldConstantPools, simplifyLuaStructures, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeObfuscationLayers, createTracePlan, findCleanupSuggestions, compareKnownSource };
