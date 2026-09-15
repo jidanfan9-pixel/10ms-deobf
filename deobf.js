@@ -426,7 +426,7 @@ function foldNumericConstants(code) {
   });
   const restoreStrings = (value) => value.replace(/\u0000(\d+)\u0000/g, (_, index) => strings[Number(index)]);
   let out = maskStrings(code);
-  const re = /(?<![\w.])(-?\d+)\s*([+%*/-])\s*(-?\d+)(?![\w.])/g;
+  const re = /(?<![\w.])\(?\s*(-?\d+)\s*\)?\s*([+%*/-])\s*\(?\s*(-?\d+)\s*\)?(?![\w.])/g;
   let previous;
   do {
     previous = out;

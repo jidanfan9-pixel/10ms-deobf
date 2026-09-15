@@ -31,7 +31,9 @@ assert.equal(deobfuscate('').success, false);
 const plain = deobfuscate('print("78")');
 assert.equal(plain.deobfuscated, 'print("78")');
 assert.equal(plain.report.outputBytes, plain.report.inputBytes);
-assert.equal(foldNumericConstants('local x = 426706428 % 4539430').code, 'local x = 8');
+assert.equal(foldNumericConstants('local x = 426706428 % 4539430').code, 'local x =8');
+assert.equal(foldNumericConstants('local x = -22027 - (-22028)').code, 'local x =1');
+assert.equal(foldNumericConstants('local x = 1023818 + -1023773').code, 'local x =45');
 assert.equal(foldNumericConstants('print("1+2")').code, 'print("1+2")');
 const advanced = detectAdvancedObfuscation(`
   local constants = { "QWxhZGRpbjpvcGVuIHNlc2FtZQ==", "0xdeadbeef" }
