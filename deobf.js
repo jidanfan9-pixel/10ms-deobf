@@ -355,6 +355,17 @@ function analyzeVMDispatcher(code) {
   return { detected, stateVariable, comparisons, assignments, branches, closures, environmentPrimitives: environments, returnCalls: returns, classification: detected ? 'closure-array-state-dispatch VM' : 'insufficient evidence', limitation: detected ? '静态结构已确认；指令语义和运行时环境仍未执行' : '未形成足够 VM 结构证据' };
 }
 
+function buildSymbolicExecutionPlan(code, options = {}) {
+  const dispatcher = analyzeVMDispatcher(code);
+  const budget = Math.max(1, Math.min(10000, Number(options.pathBudget) || 256));
+  const state = dispatcher.stateVariable;
+  const conditions = state ? [...code.matchAll(new RegExp(`\\b${escapeRegExp(state)}\\s*(==|~=|<|>|<=|>=)\\s*(-?\\d+)`, 'g'))].slice(0, budget).map(match => ({ op: match[1], value: Number(match[2]) })) : [];
+  const stateWrites = state ? [...code.matchAll(new RegExp(`\\b${escapeRegExp(state)}\\s*=\\s*([^;\\n]{1,80})`, 'g'))].slice(0, budget).map(match => match[1].trim()) : [];
+  const tableReads = [...code.matchAll(/\b([A-Za-z_]\w*)\s*\[\s*([^\]]+)\s*\]/g)].slice(0, budget).map(match => ({ table: match[1], index: match[2].trim() }));
+  const calls = [...code.matchAll(/\b([A-Za-z_]\w*)\s*\(/g)].slice(0, budget).map(match => match[1]);
+  return { mode: 'symbolic-plan-only', executable: false, pathBudget: budget, dispatcher, symbolicState: state, initialConstraints: conditions.slice(0, 20), stateWrites: stateWrites.slice(0, 50), tableReads: tableReads.slice(0, 50), callSites: [...new Set(calls)].slice(0, 50), pathCountEstimate: dispatcher.detected ? Math.min(budget, Math.max(1, conditions.length * 2)) : 0, terminalSignals: { print: /\bprint\s*\(/i.test(code), dynamicLoad: /\b(?:loadstring|load)\s*\(/i.test(code), returnClosure: /return\s*function\s*\(/i.test(code) }, next: dispatcher.detected ? '为每个状态建立约束，记录表读写和闭包返回值；需要隔离 Lua/Luau 解释器才能求值。' : '先确认 VM 分发结构。' };
+}
+
 function createTracePlan(code) {
   const hooks = [];
   const add = (target, purpose, risk) => hooks.push({ target, purpose, risk, action: 'record-only' });
@@ -546,7 +557,7 @@ function restoreStringChar(code) {
 
       const codes = [];
       for (const p of parts) {
-        const v = Number(p);
+        const v = evaluateConstantNumber(p) ?? Number(p);
         if (!Number.isInteger(v) || v < 0 || v > 255) return full;
         codes.push(v);
       }
@@ -786,6 +797,7 @@ function deobfuscate(source) {
     report.progress = analyzeObfuscationLayers(source, code);
     report.tracePlan = createTracePlan(source);
     report.vmDispatcher = analyzeVMDispatcher(source);
+    report.symbolicExecution = buildSymbolicExecutionPlan(source);
     report.cleanupSuggestions = findCleanupSuggestions(source);
 
     // 生成总结
@@ -818,4 +830,4 @@ function deobfuscate(source) {
   }
 }
 
-module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, evaluateConstantNumber, foldConstantPools, simplifyLuaStructures, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeVMDispatcher, analyzeObfuscationLayers, createTracePlan, findCleanupSuggestions, compareKnownSource };
+module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, evaluateConstantNumber, foldConstantPools, simplifyLuaStructures, restoreStringChar, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeVMDispatcher, buildSymbolicExecutionPlan, analyzeObfuscationLayers, createTracePlan, findCleanupSuggestions, compareKnownSource };
