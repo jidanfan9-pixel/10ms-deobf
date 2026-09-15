@@ -1,10 +1,12 @@
 {
   "name": "10ms-deobf",
-  "version": "1.0.0",
-  "description": "Simple Prometheus Roblox Lua deobfuscator API",
+  "version": "2.0.0",
+  "description": "Roblox Lua deobfuscator API (Prometheus / Luraph / MoonSec / IronBrew)",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "NODE_ENV=development node server.js",
+    "test": "node test/run.js"
   },
   "dependencies": {
     "express": "^4.21.0",
