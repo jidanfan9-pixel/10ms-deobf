@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10ms-deobf - Prometheus Lua 去混淆</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f12;
+      color: #e4e4e7;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+    h1 { font-size: 1.8rem; margin-bottom: 8px; color: #a78bfa; }
+    .sub { color: #a1a1aa; margin-bottom: 24px; font-size: 0.95rem; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+    textarea {
+      width: 100%;
+      height: 380px;
+      background: #18181b;
+      border: 1px solid #3f3f46;
+      border-radius: 10px;
+      color: #e4e4e7;
+      padding: 14px;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 13px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    textarea:focus { outline: none; border-color: #8b5cf6; }
+    .actions { margin: 16px 0; display: flex; gap: 12px; flex-wrap: wrap; }
+    button {
+      background: #7c3aed;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    button:hover { background: #6d28d9; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .secondary { background: #27272a; }
+    .secondary:hover { background: #3f3f46; }
+    .status { margin-top: 12px; font-size: 0.9rem; color: #a1a1aa; }
+    .hint {
+      margin-top: 20px;
+      background: #18181b;
+      border: 1px solid #3f3f46;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .hint code { background: #27272a; padding: 2px 6px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>10ms-deobf</h1>
+    <p class="sub">最简 Prometheus / WeAreDevs 风格 Roblox Lua 去混淆 · 可连接 API</p>
+
+    <div class="grid">
+      <div>
+        <label style="display:block;margin-bottom:6px;color:#a1a1aa;">混淆代码</label>
+        <textarea id="input" placeholder="粘贴 Prometheus 混淆后的 Lua 代码..."></textarea>
+      </div>
+      <div>
+        <label style="display:block;margin-bottom:6px;color:#a1a1aa;">去混淆结果</label>
+        <textarea id="output" readonly placeholder="结果会显示在这里..."></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="runBtn">去混淆</button>
+      <button class="secondary" id="clearBtn">清空</button>
+      <button class="secondary" id="copyBtn">复制结果</button>
+    </div>
+
+    <div class="status" id="status">就绪</div>
+
+    <div class="hint">
+      <strong>API 用法（任何语言都能连）：</strong><br>
+      <code>POST /deobf</code><br>
+      Body JSON: <code>{ "code": "你的混淆代码" }</code><br>
+      或直接发纯文本。<br><br>
+      当前版本只做：数字转义解码 + 常见包装清理 + 基础美化。
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+    const status = document.getElementById('status');
+    const runBtn = document.getElementById('runBtn');
+    const API = '/deobf';
+
+    runBtn.addEventListener('click', async () => {
+      const code = input.value.trim();
+      if (!code) {
+        status.textContent = '请先粘贴代码';
+        return;
+      }
+      runBtn.disabled = true;
+      status.textContent = '处理中...';
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code })
+        });
+        const data = await res.json();
+        if (data.success) {
+          output.value = data.deobfuscated || '';
+          status.textContent = data.message || '完成';
+          if (data.hints && data.hints.stringTable) {
+            status.textContent += ` | 检测到字符串表: ${data.hints.stringTable.count} 个字符串`;
+          }
+        } else {
+          output.value = '';
+          status.textContent = data.message || '失败';
+        }
+      } catch (e) {
+        status.textContent = '请求失败: ' + e.message;
+      } finally {
+        runBtn.disabled = false;
+      }
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      input.value = '';
+      output.value = '';
+      status.textContent = '已清空';
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      if (!output.value) return;
+      navigator.clipboard.writeText(output.value).then(() => {
+        status.textContent = '已复制到剪贴板';
+      });
+    });
+  </script>
+</body>
+</html>
