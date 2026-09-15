@@ -360,6 +360,28 @@ function createTracePlan(code) {
   };
 }
 
+function simplifyLuaStructures(code) {
+  let out = code;
+  const changes = { properties: 0, objects: 0, controlFlow: 0, deadCode: 0, expressions: 0 };
+  out = out.replace(/([A-Za-z_]\w*)\s*\[\s*(["'])([A-Za-z_]\w*)\2\s*\]/g, (_, object, quote, key) => { changes.properties++; return `${object}.${key}`; });
+  out = out.replace(/\[\s*(["'])([A-Za-z_]\w*)\1\s*\]\s*=/g, (_, quote, key) => { changes.objects++; return `${key}=`; });
+  out = out.replace(/\(\s*(-?\d+(?:\.\d+)?)\s*\)/g, '$1');
+  out = out.replace(/\b(true|false)\s*==\s*\1\b/gi, 'true');
+  out = out.replace(/\b(true|false)\s*~=\s*\1\b/gi, 'false');
+  changes.expressions += code.length !== out.length ? 1 : 0;
+  out = out.replace(/^\s*if\s+false\s+then\s*([\s\S]*?)\s*end\s*;?\s*$/gm, () => { changes.deadCode++; return ''; });
+  out = out.replace(/^\s*if\s+true\s+then\s*([\s\S]*?)\s*end\s*;?\s*$/gm, (_, body) => { changes.controlFlow++; return body.trim(); });
+  return { code: out, changes };
+}
+
+function findCleanupSuggestions(code) {
+  const suggestions = [];
+  if (/\b(?:hookfunction|replaceclosure|newcclosure|checkcaller|iscclosure|getgc)\s*\(/i.test(code)) suggestions.push({ type: 'anti-tamper', action: 'review', reason: '检测到 Hook/调用者检查；默认不自动删除，避免改变业务逻辑' });
+  if (/\b(?:getfenv|setfenv|debug\.getinfo|debug\.getupvalue)\s*\(/i.test(code)) suggestions.push({ type: 'environment-guard', action: 'review', reason: '检测到环境或调试完整性检查；需要隔离语义分析后再移除' });
+  if (/\b(?:proxy|metatable|newproxy)\b/i.test(code)) suggestions.push({ type: 'proxy', action: 'review', reason: '检测到代理/元表行为；仅删除无副作用的转发层才安全' });
+  return suggestions;
+}
+
 /* ═══════════════════════════════════════════════
  *  ⑥ 字符串表提取
  * ═══════════════════════════════════════════════ */
@@ -593,6 +615,14 @@ function deobfuscate(source) {
       report.phases.push({ name: '数字常量折叠', changed: r.count });
     }
 
+    // ③ 安全结构简化：只改写确定性的属性、对象、常量分支和死分支。
+    {
+      const r = simplifyLuaStructures(code);
+      code = r.code;
+      const total = Object.values(r.changes).reduce((sum, value) => sum + value, 0);
+      report.phases.push({ name: '表达式/属性/对象/控制流简化', changed: total, detail: r.changes });
+    }
+
     // ② 加密检测（结构完整时执行）
     {
       const enc = detectEncryption(code);
@@ -659,6 +689,7 @@ function deobfuscate(source) {
     report.outputBytes = code.length;
     report.progress = analyzeObfuscationLayers(source, code);
     report.tracePlan = createTracePlan(source);
+    report.cleanupSuggestions = findCleanupSuggestions(source);
 
     // 生成总结
     const changedPhases = report.phases.filter(p => p.changed).map(p => p.name);
@@ -690,4 +721,4 @@ function deobfuscate(source) {
   }
 }
 
-module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeObfuscationLayers, createTracePlan };
+module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, simplifyLuaStructures, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeObfuscationLayers, createTracePlan, findCleanupSuggestions };
