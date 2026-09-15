@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict');
-const { deobfuscate, formatLua, foldNumericConstants, evaluateConstantNumber, foldConstantPools, simplifyLuaStructures, detectAdvancedObfuscation, analyzeVMControlFlow, createTracePlan, compareKnownSource } = require('../deobf');
+const { deobfuscate, formatLua, foldNumericConstants, evaluateConstantNumber, foldConstantPools, simplifyLuaStructures, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeVMDispatcher, createTracePlan, compareKnownSource } = require('../deobf');
 const fs = require('node:fs');
 
 const cases = [
@@ -71,4 +71,7 @@ assert.equal(simplified.code.includes('t.name'), true);
 assert.equal(simplified.code.includes('dead'), false);
 assert.equal(compareKnownSource({ deobfuscated: 'print("78")' }, 'print("78")').matched, true);
 assert.equal(compareKnownSource({ deobfuscated: 'print("79")' }, 'print("78")').matched, false);
+const vm = analyzeVMDispatcher('local L=1 while L do ' + 'if L<1 then L=2 elseif L>2 then L=3 end '.repeat(6) + 'end ' + 'function() end '.repeat(5));
+assert.equal(vm.detected, true);
+assert.equal(vm.stateVariable, 'L');
 console.log(`Passed ${cases.length + 1} deobfuscator tests`);

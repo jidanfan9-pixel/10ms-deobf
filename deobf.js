@@ -342,6 +342,19 @@ function analyzeObfuscationLayers(source, output) {
   };
 }
 
+function analyzeVMDispatcher(code) {
+  const whileMatch = code.match(/while\s+([A-Za-z_]\w*)\s+do/i);
+  const stateVariable = whileMatch?.[1] || null;
+  const comparisons = stateVariable ? (code.match(new RegExp(`\\b${escapeRegExp(stateVariable)}\\s*(?:<|>|==|~=|<=|>=)`, 'g')) || []).length : 0;
+  const assignments = stateVariable ? (code.match(new RegExp(`\\b${escapeRegExp(stateVariable)}\\s*=`, 'g')) || []).length : 0;
+  const branches = (code.match(/\b(?:if|elseif)\b/g) || []).length;
+  const closures = (code.match(/\bfunction\s*\(/g) || []).length;
+  const environments = (code.match(/\b(?:select|getmetatable|newproxy|getfenv|setmetatable|unpack)\b/g) || []).length;
+  const returns = [...code.matchAll(/\breturn\s+([A-Za-z_]\w*)\s*\(/g)].slice(-5).map(match => match[1]);
+  const detected = Boolean(stateVariable && comparisons >= 3 && branches >= 10 && closures >= 5);
+  return { detected, stateVariable, comparisons, assignments, branches, closures, environmentPrimitives: environments, returnCalls: returns, classification: detected ? 'closure-array-state-dispatch VM' : 'insufficient evidence', limitation: detected ? '静态结构已确认；指令语义和运行时环境仍未执行' : '未形成足够 VM 结构证据' };
+}
+
 function createTracePlan(code) {
   const hooks = [];
   const add = (target, purpose, risk) => hooks.push({ target, purpose, risk, action: 'record-only' });
@@ -772,6 +785,7 @@ function deobfuscate(source) {
     report.outputBytes = code.length;
     report.progress = analyzeObfuscationLayers(source, code);
     report.tracePlan = createTracePlan(source);
+    report.vmDispatcher = analyzeVMDispatcher(source);
     report.cleanupSuggestions = findCleanupSuggestions(source);
 
     // 生成总结
@@ -804,4 +818,4 @@ function deobfuscate(source) {
   }
 }
 
-module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, evaluateConstantNumber, foldConstantPools, simplifyLuaStructures, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeObfuscationLayers, createTracePlan, findCleanupSuggestions, compareKnownSource };
+module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, evaluateConstantNumber, foldConstantPools, simplifyLuaStructures, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeVMDispatcher, analyzeObfuscationLayers, createTracePlan, findCleanupSuggestions, compareKnownSource };
