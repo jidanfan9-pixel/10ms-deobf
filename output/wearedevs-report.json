@@ -1,0 +1,747 @@
+{
+  "validation": {
+    "matched": false,
+    "expected": "print(\"78\")",
+    "actual": "local U={\"?ue@3R'05\",\"?hq\"\",\"?^Dt)_\";\n\"?sHjMp.c6\",\"?uoLLZ7+\",\"?'!\"6&\",\"??@X,[.cn\";\n\"?^DtjWY\\+n\",\"?%r`SW2&a7\";\n\"?uaKRZs,=\";\n\"?P2C^UuXItg.h0Jg\";\n\"?U3jZDLuM8T]A\",\"?iF%-aB9=<<B*oS[H87\",\"??M(BIYbh.k.S?le\";\n\"?^Dt6+?7s/9.h0b\";\n\"?s],%X\",\"?7W6\",\"?^Dth#'^\",\"?s13Ykq9Z/EP'AA^\";\n\"??'GHsuWbuM\";\n\"?Yb'QUud\";\n\"??7YdTYB\",\"??'Gk:'2\\K\"\",\"?U3Pc5PW$ZcP)cqXuR\";\n\"?iTo</7WNrYq.^gk/@\";\n\"?\";\n\"??VX)S'!k\",\"?''E<qS[m[-LtkDh\",\"?4)<gPBSj\"BUQ>(4'^\",\"?'?rd^u<<JZ)kX:!P5\";\n\"?%d\";\n\"?'22&9\",\"?]h'[`.b)u?IId$77`X\";\n\"?.RB]T.LP\";\n\"?Y=X7Mud\";\n\"?LoUdgYbY>+Ybh(>?71no\",\"?.D%K[\";\n\"?]*.K*PtA;\nM]T6Br?i\",\"?7WW\";\n\"?7Cl_uS2!G,L$+E2Y>I\",\"?.c+SF\",\"?uWUVo)l7\",\"?727dCukUZ$YH^k\"'^\",\"?u[=EI?i\",\"?\\h:Y^)#Po0YF[ne\",\"?sOp\"}local function S(S)return U[S+(-844356+860808)]\nend for S,L in ipairs({{-64808+64809,476227+-476181},{-22027--22028,-258825--258832};\n{426706428%4539430,243612766%2082160}})do\nwhile L[432148-432147]<L[528163+-528161]do\n U[L[-98223+98224]],U[L[140161366%10011526]],L[1396478667%5770573],L[-130773--130775]=U[L[-392315--392317]],U[L[-235767+235768]],L[590783-590782]+(-682088+682089),L[188261478%14481652]-792240391%8802671\nend\nend do\nlocal S=U local L=string.len local q=string.char local l=table.concat local Q=string.sub local T=type local o={[\"^\"]=952929714%7562934,B=-468255+468294,C=1757748289%7709422;\na=731931+-731864,f=-749722+749793;\n_=1141028326%15419301,[\")\"]=388379-388341,[\"\"\"]=237945+-237863,s=1940580624%9110707;\nL=-315074--315101;\nj=-328641--328685;\n[\"8\"]=1033282185%6339154,F=1270363259%12098697,k=914093837%3856936;\np=-334980+334980;\n[\"7\"]=270858581%14255713;\nQ=77613177%5970239,V=46637713%613654;\n[\":\"]=26972-26943,[\"2\"]=88499095%355418;\nK=881610281%9688025,[\"(\"]=66387822%1475284,[\"%\"]=2913226173%11988585,[\">\"]=-712123--712200,[\"`\"]=-500882+500948,t=290202088%1511469;\nI=80213614%1485437;\n[\".\"]=130742-130711,[\"*\"]=2453947698%13709205,Z=-242482+242558,r=470441-470383;\n[\"?\"]=1316895259%11160129,H=617595068%4901548;\n[\"9\"]=323172935%6595366;\nR=398181-398100;\nd=956835-956781,h=389436-389383,[\"6\"]=685646+-685590;\nc=-303043--303123,J=484454+-484435,[\"$\"]=66613-66552;\nX=2867451928%12150220;\nN=2009481324%12032822,A=1023818+-1023773,W=393068-393003;\n[\"/\"]=901783320%14090364;\ng=953796-953734;\n[\"-\"]=-34583+34630,[\"=\"]=-988631+988709;\n[\"&\"]=223501+-223455,[\"#\"]=2816701713%13673309;\nE=375690765%1869108;\nl=883668+-883664;\nP=-688926--688952;\n[\"!\"]=-907804--907845,G=1615923253%10845122,[\"<\"]=906428+-906416;\nO=218575-218527,[\"3\"]=640446-640374,[\";\n\"]=-157435--157478,o=-534813--534823,m=-47531--47580,[\"'\"]=-659367+659402;\nS=-866190--866215;\n[\"]\"]=520168621%14861960;\n[\"1\"]=393389169%1812853,b=2794913211%15614040,U=146851261%825007;\nY=1056180227%5588255,[\"4\"]=905955+-905938,e=-619244+619308;\n[\"\\\"]=61196982%2781680;\nu=-241603+241639,[\"5\"]=1454411290%5960702,[\"+\"]=585762+-585702;\nD=325617+-325562;\nT=174098238%9163061;\n[\"@\"]=187228503%5200790;\n[\"[\"]=-335016+335027,n=736547736%4661694;\n[\"0\"]=-141800--141869,q=-216184--216212;\n[\",\"]=-588911--588925,M=1574057689%13929714;\ni=990330-990307}local I=table.insert local Z=math.floor local w={G=-260845+260905;\n[\"3\"]=2091344419%11815505;\nK=248719487%12435972,[\"1\"]=1120434286%16238178;\nd=-765780--765832,z=440713+-440701;\nw=-342679+342700,P=221480-221450,k=-942744--942780,[\"9\"]=42335-42333;\nD=-401782--401804,p=636433386%3857172,x=2116732302%16536971;\nF=887524-887486,Z=240766-240755;\nC=-531000+531058,I=10437-10419,s=773921033%14883096,[\"6\"]=670180481%8935739,U=688736592%7486267,v=171270+-171241,R=1570659817%14150088,[\"/\"]=1203445356%5928302;\no=895158+-895134,E=-686519--686534,r=-174286--174326;\nB=-522793--522848,y=110859321%1421273,i=369984430%1728899;\n[\"2\"]=300163-300147;\nj=1217619888%10496723;\nq=63483938%1923755;\nh=-948964+949026;\nf=897762+-897701,A=-409501+409501,L=249166+-249165;\nN=3249631275%13050728;\nc=1969467344%13397737;\nO=-1016659+1016702,[\"7\"]=835840814%10319022;\ne=-684555+684618,H=533998+-533939,[\"+\"]=234722498%998819,J=105030+-105021,l=1046168-1046122,u=880672-880664;\n[\"5\"]=302786+-302760;\nX=182952+-182904,T=-981543--981582,a=171193-171139;\nS=-586598+586629,V=2010573461%12111888;\ng=-155851--155902,m=1026525-1026518,n=-558983+559008;\nQ=1728571657%8642858,b=716808-716773;\nM=660994077%4348645,W=30289867%6057970;\n[\"8\"]=-773943--773953;\nY=1043511819%10331800;\nt=227218-227176,[\"4\"]=-1048063--1048108,[\"0\"]=304417+-304404}for U=-992920--992921,#S,-456303--456304do local z=S[U]if T(z)==\"string\"then\n local T=Q(z,937376+-937375,-324319--324320)if T==\"£\"then\n z=Q(z,-194778--194780)local T=L(z)local o={}local s=80051765%3078914 local h=46888-46888 local i=836422+-836422 while s<=T do\n local U=Q(z,s,s)local S=w[U]if S then\n h=h+S*((599896497%5503637)^(((817261-817258)-i)))i=i+(-238813--238814)if i==171018-171014 then\n i=3269731530%16767854 local U=Z(h/(392628876%5304910))local S=Z((h%(14274--51262))/(-1004797+1005053))local L=h%(-634980--635236)I(o,q(U,S,L))h=1334362332%10185972\n end\n elseif U==\"=\"then\n I(o,q(Z(h/(904923+-839387))))if s>=T or Q(z,s+139335421%1678740,s+(977307-977306))~=\"=\"then\n I(o,q(Z((h%(1689239274%7441294))/(875844352%13685064))))\n end break\n end s=s+1084040140%9109581\nend S[U]=l(o)\nelseif T==\"?\"then\n z=Q(z,2)local T=L(z)local w={}local s=1 while s<=T do\n local U=(T-s)+1)local S=U>=5 and 5 or U local L=0 local l=S>1 for U=0,4,1 do\n local q if U<S then\n local S=Q(z,s+U,s+U)q=o[S]if not q then\n l=false break\n end\n else\n q=84\n end L=L*85+q\nend if l then\nlocal U=Z(L/0)local l=Z(L/0)local Q=Z(L/0)local T=L%256)if S==5 then\n I(w,q(U,l,Q,T))\nelseif S==4 then\n I(w,q(U,l,Q))\nelseif S==3)then\n I(w,q(U,l))\nelseif S==2 then\n I(w,q(U))\nend\nend s=s+S\nend S[U]=l(w)\nend\nend\nend\nend return(function(o,T,l,I,q,U,Q,K,F,z,w,y,Z,i,L,c,r,H,h,s)H,Z,L,r,i,y,w,z,F,s,c,K,h=function(U,S)local q=h(S)local l=function()return L(U,{},S,q)\n end return l\nend,{},function(L,l,Q,T)local j,a,X,i,s,W,x,p,y,d,u,h,m,B,E,N,G,C,g,M,U0,e,O,n,w,A,R,f,k,b,Y,D,I,J,P,v,t,V while L do\n if L>8360669 then\n if 12205268>L then\n if L<10479496 then\n if L>9806842 then\n if 10168794>L then\n if L<9916816 then\n h=201 s=Z[Q[3]]w=s*h h,s=1,257 I=w%s Z[Q[3]]=I s=Z[Q[3]]w=s~=h L=w and 9707882 or 9892463\n elseif L<10029828)then\n A=S-16438J=U[A]m,L=J,15843029\n else\n L=k L,a=4595467,U0\n end\n else\n if 10247086>L then\n y,i=2,1 s=Z[Q[1]]h=s(i,y)s=1 w=h==s I,L=w,w and 12259604 or 10521963\n elseif 10356051>L then\n m,A=m+d,not J j=R>=m j=A and j A=R<=m A=J and A j=A or j A=1841009 L=j and A j=11317998)L=L or j\n else\n L=13725904~=8322748 L=L and 15634609)or 15241844\n end\n end\n else\n if L>9501300 then\n if 9687453>L then\n B=L U0=Z[s]a,L=U0,U0 and 2730605 or 4595467\n elseif 9714552>L then\n R,h=2,32)s=Z[Q[3]]w=s%h h=13 g=Z[Q[3]]y=g-w g=32 i=y/g s=h-i y=Z[Q[4]]L=7424929 E=Z[Q[2]]j=R^s C=E/j g=y(C)y,j=4294967296,1 i=g%y g=2)y=g^w h=i/y d=256 y=Z[Q[4]]E=h%j j=4294967296 C=E*j g=y(C)y=Z[Q[4]]C=y(h)A=256)i=g+C E=65536 g=65536 y=i%g C=i-y j=256 g=C/E E=y%j m=y%d R=y-m m,w,y=256,nil,nil j=R/m h,m,i,s=nil,256,nil,nil R=g%m J=g%A d=g-J J,g=256,nil m=d/J C={E,j;\n R,m}Z[Q[1]]=C\n else\n w,I=S(-16409,S-16424L=U[I]I=L(w)I,L={},U[S(-16420]\n end\n else\n if L<8709773)then\n L=2319256)\n elseif L<9108914 then\n C,I=h,0 L=C==I L=L and 15633598 or 7342340\n elseif L<9248865 then\n R=Z[g]L,h=12067324,R\n else\n E=6428834<=12579069)L=E and 3146283)or 4634449\n end\nend\nend\nelse\n if L>11171320 then\n if L<11871997 then\n if L<11464557 then\n g,L,C,j=nil,2846246,nil,E h[s]=j i,E=nil,nil\n elseif 11643893>L then\n w=Z[Q[1]]I=#w w=0 L=I==w L=L and 1998355 or 7424929\n else\n V=Z[s]b,N=L,V L=V and 12150932 or 2989826\n end\n else\n if L<12081448 then\n t,d,m=S-16423,S-16423,S-16413R=U[m]m,L=S(-16444,C C=R[m]R=z()Z[R]=C m=U[d]A,d=L,S-16411C=m[d]x=U[t]J,d=x,L L=x and 1900532 or-9035717\n elseif L<12123252)then\n L=10737063\n else\n L=2989826 V=J==A N=V\n end\nend\nelse\n if L>10746305)then\n if L<10885429 then\n R=4715395<=13186927 j=Z[s]E=j==R L=E and 3793439 or 7499979\n elseif 11019976>L then\n L=659014)\n else\n L=7679194\n end\nelse\n if-11847271>L then\n L=12259604 s=Z[Q[2]]h=Z[Q[3]]w=s==h I=w\n elseif 10721585>L then\n f,u=6,1 b=Z[R]V=b(u,f)b=S-16406U[b]=V f=S-16406u=U[f]f=2)b=u>f L=b and 12992045 or 13141291\n elseif L<10732697 then\n L=11015310\n else\n L=14765213>=13911686 L=L and 4769652)or 12390550\n end\nend\nend\nend\nelse\n if 14469499>L then\n if L<13058006 then\n if L<12584366 then\n if 12271509>L then\n L=I and 12422496)or 5509209\n elseif L<12336982 then\n R=6 j=C==R L=j and 3433542 or 659014)\n elseif L<12406523)then\n L=15616397\n else\n i=S-16425j=F(3392567,{})I,E=S(-16422,S-16440L=U[I]w=Z[Q[4]]h=U[i]C=U[E]E={C(j)}g,C={q(E)},2 y=g[C]i=h(y)h=S-16436s=w(i,h)w={s()}I=L(q(w))w=I s=Z[Q[5]]I,L=s,s and 13015215 or 4838203\n end\n else\n if L<12869140 then\n L=2263287)\n elseif 13003630>L then\n u,D=S(-16425,S-16428b=U[u]f=U[D]u=b(f)b=S-16406U[b]=u L=90740)\n else\n h=Z[Q[6]]L=4838203 s=h==w I=s\n end\n end\nelse\n if-14753220>L then\n if L<13121044 then\n x=z()A={}t=H(11611116,{x;\n C,y;\n g})n=nil O=z()v,d,f=S(-16437,nil,S-16431Z[x]=A A=z()L,e=U[S(-16416],S-16430Z[A]=t t,D={},{}Z[O]=t t=U[f]M=Z[O]m,X=nil,{[v]=M;\n [e]=n}f=t(D,X)t=r(15497581,{O;\n x;\n R,C;\n y,A})I,s,i={},f,nil O=c(O)h=t y=c(y)J=nil R=c(R)g=c(g)y=S-16447C=c(C)m=22126428612671 i=U[y]A=c(A)R=S-16443C=h(R,m)g=s[C]y=i(g)x=c(x)s,h=nil,nil\n elseif 13511305>L then\n f=S-16406b=U[f]f=S-16428U[f]=b L=90740\n else\n L=Z[Q[10]]s=Z[Q[11]]w[L]=s L=Z[Q[12]]s={L(w)}L,I=U[S(-16412],{q(s)}\n end\nelse\n if-15414852>L then\n L,I=1291757~=10900275,{}Z[Q[1]]=L L=U[S(-16446]\n elseif L<14168807 then\n W=1)Z[s]=B p=Z[v]L=U0 G=p+W Y=M[G]k=J+Y Y=256)U0=k%Y J=U0 G=Z[X]Y=A+G L,G=14662934,256)k=Y%G A=k\n else\n I,w,h=0,l,6)s=z()L,i=S(-16445,h Z[s]=L h=1 y,L=h,4473909 h=0 g=y<h h=I-y\n end\nend\nend\nelse\n if L>15634103 then\n if L>16086477 then\n if 16372620>L then\n L=2263287\n elseif L<16518913)then\n C,h=not g,y+h s=i>=h s=C and s C=h>=i C=g and C s=C or s C=60038 L=s and C s=13881320 L=L or s\n else\n L,I=U[S(-16426],{}\n end\n else\n if L<15738819)then\n I=S-16406L=U[I]w=S-16428I=U[w]w=S-16428U[w]=L w=S-16406U[w]=I w=Z[Q[1]]s=w()L=10437030\n elseif L<15892809 then\n L=d N=K(7565141,{})x=65 d=z()f=S-16425Z[d]=m A,O=3,S-16440m=Z[R]J=m(A,x)m=z()Z[m]=J J,A=0,0 L=685589 t=U[O]O={t(N)}x={q(O)}O=2 t=x[O]N=S-16422O=U[N]b=Z[i]u=U[f]f=u(t)u=S-16436V=b(f,u)b={V()}N=O(q(b))O=z()Z[O]=N b=Z[m]N,V=1,b b=1)u=b b=0 f=u<b b=N-u\n else\n j=3 E=C==j L=E and 10755548 or 7246976)\n end\nend\nelse\n if 15499611>L then\n if 14952389>L then\n L=685589)e=c(e)n=c(n)N=c(N)D=c(D)M=nil v=c(v)X=c(X)\n elseif L<15262709 then\n I,L={},U[S(-16415]\n elseif 15390578>L then\n L=659014\n else\n w,s=l[1],l[2]L=Z[Q[1]]h=L L=h[s]L=L and 3783109 or 8082145\n end\nelse\n if 15559019>L then\n E=2 I=C==E L=I and 3620942 or 15942590\n elseif L<15624997 then\n L=11027732>=14406199)Z[s]=L L=659014\n else\n I=Z[s]E=S-16445L=I~=E L=L and-12939731 or 15616397)\n end\nend\nend\nend\nend\nelse\n if L<4702050)then\n if L>2788425 then\n if 3672453>L then\n if L<3288030)then\n if L<2918036 then\n I,L={s},U[S-16434]\n elseif L<3068054)then\n Z[s]=N L=b b=Z[s]L=b and 2034384 or 8363870\n elseif 3164888>L then\n L=9335577\n else\n w=S-16424L=U[w]h=0)s=Z[Q[8]]w=L(s,h)L=5530476\n end\n else\n if L<3413054 then\n I,h,s=8837315,14935625,S-16417w=s^h L=I-w I,w=S(-16435,L L=I/w I={L}L=U[S(-16432]\n elseif L<3527242 then\n j,L=6571472>15318046,659014)Z[s]=j\n else\n I=2477324~=14781771)Z[s]=I L=659014\n end\n end\nelse\n if L<4133674 then\n if 3753536>L then\n y=c(y)d=c(d)i=c(i)m=c(m)h=nil O=c(O)A,d=nil,S-16418s=c(s)i,t,h,s=2,nil,nil,nil x=nil R=c(R)C,A=nil,S-16413R=z()g=c(g)y=z()C=S-16413Z[y]=i J=nil g=U[C]C=S-16410i=g[C]x=256 C=z()g=z()Z[g]=i i=0 Z[C]=i i={}Z[R]=i J=S-16423m=U[d]d=S-16450i=m[d]d=U[J]t,L,J=x,6423928,S-16449m=d[J]J=U[A]A=S-16444d=J[A]J,A={},1 x=1 O=x x=0)f=O<x x=A-O\n elseif 3788274>L then\n L,I=U[S(-16451],{s}\n else\n L=5158287\n end\nelse\n if L<4534688 then\n h,C=h+y,not g I=h<=i I=C and I C=h>=i C=g and C I=C or I C=9055676 L=I and C I=6294928 L=L or I\n elseif 4614958>L then\n Z[s]=a L=B L=14662934\n else\n L=5158287\n end\nend\nend\nelse\n if L<1949443)then\n if L<1126965 then\n if-293329>L then\n j,E,s=255,0,h L=Z[Q[1]]C=L(E,j)L=16514875)w[s]=C s=nil\n elseif L<374877 then\n L=5674774\n elseif L<672301 then\n L,C=4473909,nil\n else\n D,b=not f,b+u N=V>=b N=D and N D=V<=b D=f and D N=D or N D=6945495 L=N and D N=11676671 L=L or N\n end\n else\n if L<1704675 then\n L=11015310\n elseif 1870770>L then\n j,b=m,S-16418N=U[b]b=S-16408O=N[b]N=O(w,j)j=nil O=Z[Q[6]]b=O()t=N+b x=t+C t=256)A=x%t C,N=A,1 O=C+N L=10275072 t=i[O]x=E..t E=x\n else\n O=S-16423t=U[O]O,L=S-16438,7910179 x=t[O]J=x\n end\nend\nelse\n if L<2326132 then\n if L<2016369 then\n s=Z[Q[2]]h=213 w=s*h s=27552854471197)I=w+s w=35184372088832 L=I%w Z[Q[2]]=L L=9892463\n elseif 2148835>L then\n L=3723964)\n elseif 2291271>L then\n j=1312518>=1172835 L=j and 12746236 or 1568342)\n else\n b=r(5449357,{y})V={b()}L,I=U[S(-16448],{q(V)}\n end\nelse\n if L<2444842 then\n p=2 G=M[p]p=Z[n]Y=G==p L,U0=10118487,Y\n elseif 2643640>L then\n m=13384831<12291902)R=Z[s]j=R==m L=j and-11134997 or 16230365\n else\n p,k=1,L G=M[p]p=11478610>12206269 Y=G==p U0,L=Y,Y and 2333009 or-10335421\n end\nend\nend\nend\nelse\n if-8161751>L then\n if L>5519842 then\n if L>6116185)then\n if L<6240038)then\n L,E=659014,9806090<4100566 Z[s]=E\n elseif 6359428>L then\n y,L,m=S(-16418,6024621~=9269161,S-16440Z[s]=L i=U[y]C,y=L,S-16441h=i[y]i=z()y=z()Z[i]=h h=r(9721222,{})g=z()Z[y]=h h=8342614<=2750927 Z[g]=h d=F(13925288,{g})R=U[m]m=R(d)L,h=m and 9162153 or-12960200,m\n else\n D,x=not f,O+x A=t>=x A=D and A D=t<=x D=f and D A=D or A D=5062745 L=A and D A=11024643 L=L or A\n end\n else\n if L<5602625 then\n L={}h=Z[Q[9]]w,s,i=L,1,h h=1 y=h h=0)g,L=h>y,16514875 h=s-y\n elseif 5860998>L then\n b=2282954~=6891878)L=b and 10714839 or 16522952\n else\n L=5674774)\n end\n end\nelse\n if L<5110516 then\n if L<4803927 then\n L=10737063\n elseif -4974555>L then\n w=nil Z[Q[5]]=I L=5509209\n elseif L<4998968)then\n R=5 j=C==R L=j and 2556676 or-12617258\n else\n A=x D,L=A,6423928)J[A]=D A=nil\n end\nelse\n if 5303822>L then\n L=659014)\n elseif L<5479283 then\n L=10437030)\n else\n L=Z[Q[7]]L=L and-5193739 or 5530476\n end\nend\nend\nelse\n if L<7622167 then\n if 7399760>L then\n if L<7096235)then\n N=z()e=255 Z[N]=b v=S-16413X=U[v]v=S-16444D=X[v]a,M,P,v=1,100,10000,1 X=D(v,M)B=2 D=z()M=0 Z[D]=X X=Z[R]v=X(M,e)X=z()Z[X]=v v=Z[R]n=Z[D]Y,W,e=S(-16425,0,1 M=v(e,n)v=z()Z[v]=M e=Z[R]n=e(a,B)e=1 M=n==e n,B=S(-16436,S-16414e=z()Z[e]=M k=U[Y]G=Z[R]p={G(W,P)}M=S-16429Y=k(q(p))M,k=t[M],S-16414U0=Y..k a=B..U0 M=M(t,n,a)n=z()Z[n]=M U0=r(10219101,{R,N,m,i;\n s,O;\n e;\n n;\n D,v;\n X,d})B=S-16440a=U[B]B={a(U0)}a=Z[e]L,M=a and 9667024 or 8357468,{q(B)}\n elseif 7294658>L then\n j=4 E=C==j L=E and-7195084 or 4935192\n elseif L<7358466 then\n E=1 I=C==E L=I and 7374592 or-15817925\n else\n j=13669521<11479282 E=Z[s]I=E==j L=I and-8854202 or-16804301\n end\n else\n if L<7462454)then\n s=Z[Q[1]]i=nil w=#s L=U[S(-16407]h=Z[Q[1]]s=h[w]I={s}h=Z[Q[1]]h[w]=i\n elseif 7532560>L then\n L=9335577\n else\n I,h,s=13491848,3661744,S-16439w=s^h L=I-w I,w=S(-16433,L L=I/w I={L}L=U[S(-16421]\n end\nend\nelse\n if L<8088497)then\n if 7794686>L then\n D,x=1,1 t=#J A=d(x,t)x=m(J,A)t=Z[R]f=x-D O=i(f)t[x]=O x,f=nil,0 O=#J A=nil t=O==f L=t and-13242525 or-8774520\n elseif L<7996162 then\n m,L=J,A L=J and 15843029 or 9941170\n else\n y,L,j=35184372088832,{},1)Z[Q[2]]=L I=Z[Q[3]]i=I I=s%y C=255 Z[Q[4]]=I g=s%C C=2 y=g+C m=1 Z[Q[5]]=y d=m m,C=0,S-16419g=#w h[s]=C E,R,J,L=S(-16419,g,d<m,10275072 m,C=j-d,204\n end\nelse\n if 8178158>L then\n L=15283575\n elseif 8309467>L then\n L,Y=14061549,1)k=M[Y]B=k\n else\n U0=L k=Z[s]B,L=k,k and 8261466 or 14061549\n end\nend\nend\nend\nend\nend\nend L=#T return q(I)\nend,function(U,S)local q=h(S)local l=function(l,Q,T,o,I)return L(U,{l,Q,T;\n o;\n I},S,q)\nend return l\nend,function(U)local S,L=1,U[1]while L do\n w[L],S=w[L]-1,1+S if-1963094==w[L]then\n w[L],Z[L]=nil,nil\n end L=U[S]\nend\nend,function(U,S)local q=h(S)local l=function(...)return L(U,{...},S,q)\nend return l\nend,{},function()s=1)+s w[s]=1 return s\nend,function(U,S)local q=h(S)local l=function(l)return L(U,{l},S,q)\nend return l\nend,0,function(U)w[U]=w[U]-1)if w[U]==0 then\n w[U],Z[U]=nil,nil\nend\nend,function(U,S)local q=h(S)local l=function(l,Q,T)return L(U,{l,Q,T},S,q)\nend return l\nend,function(U)for S=1,#U,1 do\n w[U[S]]=w[U[S]]+1)\nend if l then\nlocal L=l(true)local q=T(L)q[S(-16437],q[S(-16442],q[S-16427]=U,i,function()return 3373966\nend return L\nelse\n return Q({},{[S-16442]=i,[S(-16437]=U,[S(-16427]=function()return 3373966\n end})\nend\nend return(y(14276065,{}))(q(I))\nend)(select,getmetatable,newproxy,{...},unpack or table[S(-16438],getfenv and getfenv()or _ENV,setmetatable)",
+    "note": "静态分析尚未证明与已知原始源码一致；不要把字符缩减当作完整还原"
+  },
+  "report": {
+    "inputBytes": 21688,
+    "phases": [
+      {
+        "name": "转义解码",
+        "changed": 1,
+        "detail": {
+          "decimal": 1,
+          "hex": 0,
+          "unicode": 0,
+          "brace": 0
+        }
+      },
+      {
+        "name": "数字常量折叠",
+        "changed": 535
+      },
+      {
+        "name": "常量池查表展开",
+        "changed": 0,
+        "detail": {
+          "tables": 3,
+          "resolvers": 0
+        }
+      },
+      {
+        "name": "表达式/属性/对象/控制流简化",
+        "changed": 1,
+        "detail": {
+          "properties": 0,
+          "objects": 0,
+          "controlFlow": 0,
+          "deadCode": 0,
+          "expressions": 1
+        }
+      },
+      {
+        "name": "高级混淆模式检测",
+        "changed": 2
+      },
+      {
+        "name": "注释剥离",
+        "changed": 47
+      },
+      {
+        "name": "包装器剥离",
+        "changed": 1
+      },
+      {
+        "name": "string.char 还原",
+        "changed": 0
+      },
+      {
+        "name": "字符串拼接合并",
+        "changed": 0
+      },
+      {
+        "name": "变量重命名",
+        "changed": 0
+      },
+      {
+        "name": "格式美化",
+        "changed": 1
+      }
+    ],
+    "warnings": [],
+    "hints": {
+      "obfuscator": "WeAreDevs",
+      "advanced": [
+        {
+          "type": "hybrid-literal",
+          "name": "混合字面量混淆",
+          "severity": "medium",
+          "confidence": 0.78,
+          "desc": "数字、布尔值或位运算被拆分为不同表达式，疑似采用多策略隐藏常量",
+          "evidence": "numeric=0, boolean=0"
+        },
+        {
+          "type": "dynamic-string-decryption",
+          "name": "字符串加密与动态解密",
+          "severity": "high",
+          "confidence": 0.87,
+          "desc": "检测到编码字符串数组及运行时解码/拼接逻辑，字符串可能只在执行期间还原",
+          "evidence": "dynamicStringCalls=0"
+        }
+      ],
+      "vmControlFlow": {
+        "detected": true,
+        "stateVariable": "L",
+        "states": [
+          374877,
+          672301,
+          1126965,
+          1704675,
+          1949443,
+          2016369,
+          2326132,
+          2444842,
+          2788425,
+          2918036,
+          3068054,
+          3288030,
+          3413054,
+          3527242,
+          4133674,
+          4534688,
+          4702050,
+          4803927,
+          4998968,
+          5110516,
+          5479283,
+          5519842,
+          5602625,
+          6116185,
+          6240038,
+          7096235,
+          7358466,
+          7462454,
+          7622167,
+          7996162,
+          8088497,
+          8360669,
+          8709773,
+          9108914,
+          9248865,
+          9501300,
+          9806842,
+          9916816,
+          10029828,
+          10479496,
+          10732697,
+          10746305,
+          10885429,
+          11171320,
+          11464557,
+          11871997,
+          12081448,
+          12123252,
+          12336982,
+          12406523,
+          12584366,
+          12869140,
+          13058006,
+          13121044,
+          14168807,
+          15262709,
+          15624997,
+          15634103,
+          15738819,
+          15892809,
+          16086477,
+          16518913
+        ],
+        "blocks": [
+          {
+            "state": 374877,
+            "condition": "L == 374877"
+          },
+          {
+            "state": 672301,
+            "condition": "L == 672301"
+          },
+          {
+            "state": 1126965,
+            "condition": "L == 1126965"
+          },
+          {
+            "state": 1704675,
+            "condition": "L == 1704675"
+          },
+          {
+            "state": 1949443,
+            "condition": "L == 1949443"
+          },
+          {
+            "state": 2016369,
+            "condition": "L == 2016369"
+          },
+          {
+            "state": 2326132,
+            "condition": "L == 2326132"
+          },
+          {
+            "state": 2444842,
+            "condition": "L == 2444842"
+          },
+          {
+            "state": 2788425,
+            "condition": "L == 2788425"
+          },
+          {
+            "state": 2918036,
+            "condition": "L == 2918036"
+          },
+          {
+            "state": 3068054,
+            "condition": "L == 3068054"
+          },
+          {
+            "state": 3288030,
+            "condition": "L == 3288030"
+          },
+          {
+            "state": 3413054,
+            "condition": "L == 3413054"
+          },
+          {
+            "state": 3527242,
+            "condition": "L == 3527242"
+          },
+          {
+            "state": 4133674,
+            "condition": "L == 4133674"
+          },
+          {
+            "state": 4534688,
+            "condition": "L == 4534688"
+          },
+          {
+            "state": 4702050,
+            "condition": "L == 4702050"
+          },
+          {
+            "state": 4803927,
+            "condition": "L == 4803927"
+          },
+          {
+            "state": 4998968,
+            "condition": "L == 4998968"
+          },
+          {
+            "state": 5110516,
+            "condition": "L == 5110516"
+          },
+          {
+            "state": 5479283,
+            "condition": "L == 5479283"
+          },
+          {
+            "state": 5519842,
+            "condition": "L == 5519842"
+          },
+          {
+            "state": 5602625,
+            "condition": "L == 5602625"
+          },
+          {
+            "state": 6116185,
+            "condition": "L == 6116185"
+          },
+          {
+            "state": 6240038,
+            "condition": "L == 6240038"
+          },
+          {
+            "state": 7096235,
+            "condition": "L == 7096235"
+          },
+          {
+            "state": 7358466,
+            "condition": "L == 7358466"
+          },
+          {
+            "state": 7462454,
+            "condition": "L == 7462454"
+          },
+          {
+            "state": 7622167,
+            "condition": "L == 7622167"
+          },
+          {
+            "state": 7996162,
+            "condition": "L == 7996162"
+          },
+          {
+            "state": 8088497,
+            "condition": "L == 8088497"
+          },
+          {
+            "state": 8360669,
+            "condition": "L == 8360669"
+          },
+          {
+            "state": 8709773,
+            "condition": "L == 8709773"
+          },
+          {
+            "state": 9108914,
+            "condition": "L == 9108914"
+          },
+          {
+            "state": 9248865,
+            "condition": "L == 9248865"
+          },
+          {
+            "state": 9501300,
+            "condition": "L == 9501300"
+          },
+          {
+            "state": 9806842,
+            "condition": "L == 9806842"
+          },
+          {
+            "state": 9916816,
+            "condition": "L == 9916816"
+          },
+          {
+            "state": 10029828,
+            "condition": "L == 10029828"
+          },
+          {
+            "state": 10479496,
+            "condition": "L == 10479496"
+          },
+          {
+            "state": 10732697,
+            "condition": "L == 10732697"
+          },
+          {
+            "state": 10746305,
+            "condition": "L == 10746305"
+          },
+          {
+            "state": 10885429,
+            "condition": "L == 10885429"
+          },
+          {
+            "state": 11171320,
+            "condition": "L == 11171320"
+          },
+          {
+            "state": 11464557,
+            "condition": "L == 11464557"
+          },
+          {
+            "state": 11871997,
+            "condition": "L == 11871997"
+          },
+          {
+            "state": 12081448,
+            "condition": "L == 12081448"
+          },
+          {
+            "state": 12123252,
+            "condition": "L == 12123252"
+          },
+          {
+            "state": 12336982,
+            "condition": "L == 12336982"
+          },
+          {
+            "state": 12406523,
+            "condition": "L == 12406523"
+          },
+          {
+            "state": 12584366,
+            "condition": "L == 12584366"
+          },
+          {
+            "state": 12869140,
+            "condition": "L == 12869140"
+          },
+          {
+            "state": 13058006,
+            "condition": "L == 13058006"
+          },
+          {
+            "state": 13121044,
+            "condition": "L == 13121044"
+          },
+          {
+            "state": 14168807,
+            "condition": "L == 14168807"
+          },
+          {
+            "state": 15262709,
+            "condition": "L == 15262709"
+          },
+          {
+            "state": 15624997,
+            "condition": "L == 15624997"
+          },
+          {
+            "state": 15634103,
+            "condition": "L == 15634103"
+          },
+          {
+            "state": 15738819,
+            "condition": "L == 15738819"
+          },
+          {
+            "state": 15892809,
+            "condition": "L == 15892809"
+          },
+          {
+            "state": 16086477,
+            "condition": "L == 16086477"
+          },
+          {
+            "state": 16518913,
+            "condition": "L == 16518913"
+          }
+        ],
+        "edges": [
+          {
+            "from": null,
+            "to": -315074
+          },
+          {
+            "from": null,
+            "to": 249166
+          },
+          {
+            "from": null,
+            "to": 0
+          },
+          {
+            "from": null,
+            "to": 13725904
+          },
+          {
+            "from": 9501300,
+            "to": 7424929
+          },
+          {
+            "from": 8709773,
+            "to": 2319256
+          },
+          {
+            "from": 12123252,
+            "to": 10737063
+          },
+          {
+            "from": 12123252,
+            "to": 2989826
+          },
+          {
+            "from": 10885429,
+            "to": 659014
+          },
+          {
+            "from": 10885429,
+            "to": 7679194
+          },
+          {
+            "from": 10885429,
+            "to": 12259604
+          },
+          {
+            "from": 10732697,
+            "to": 11015310
+          },
+          {
+            "from": 10732697,
+            "to": 14765213
+          },
+          {
+            "from": 12406523,
+            "to": 15616397
+          },
+          {
+            "from": 12869140,
+            "to": 2263287
+          },
+          {
+            "from": 12869140,
+            "to": 90740
+          },
+          {
+            "from": 12869140,
+            "to": 4838203
+          },
+          {
+            "from": null,
+            "to": 90740
+          },
+          {
+            "from": 16086477,
+            "to": 2263287
+          },
+          {
+            "from": 15738819,
+            "to": 10437030
+          },
+          {
+            "from": 15892809,
+            "to": 685589
+          },
+          {
+            "from": null,
+            "to": 685589
+          },
+          {
+            "from": 15262709,
+            "to": 659014
+          },
+          {
+            "from": 15624997,
+            "to": 11027732
+          },
+          {
+            "from": 15624997,
+            "to": 659014
+          },
+          {
+            "from": 3068054,
+            "to": 9335577
+          },
+          {
+            "from": 3068054,
+            "to": 5530476
+          },
+          {
+            "from": 3527242,
+            "to": 6571472
+          },
+          {
+            "from": 3527242,
+            "to": 659014
+          },
+          {
+            "from": null,
+            "to": 5158287
+          },
+          {
+            "from": 4534688,
+            "to": 14662934
+          },
+          {
+            "from": 4534688,
+            "to": 5158287
+          },
+          {
+            "from": 1126965,
+            "to": 16514875
+          },
+          {
+            "from": 374877,
+            "to": 5674774
+          },
+          {
+            "from": 1704675,
+            "to": 11015310
+          },
+          {
+            "from": 1704675,
+            "to": 10275072
+          },
+          {
+            "from": 2016369,
+            "to": 9892463
+          },
+          {
+            "from": 2016369,
+            "to": 3723964
+          },
+          {
+            "from": 5602625,
+            "to": 5674774
+          },
+          {
+            "from": 4803927,
+            "to": 10737063
+          },
+          {
+            "from": 4803927,
+            "to": 5509209
+          },
+          {
+            "from": 4998968,
+            "to": 659014
+          },
+          {
+            "from": 5479283,
+            "to": 10437030
+          },
+          {
+            "from": 7462454,
+            "to": 9335577
+          },
+          {
+            "from": null,
+            "to": 15283575
+          },
+          {
+            "from": null,
+            "to": 1
+          }
+        ]
+      },
+      "stringTables": [
+        {
+          "name": "U",
+          "type": "string-array",
+          "count": 33,
+          "samples": [
+            "?ue@3R'05",
+            "?hq",
+            ",",
+            ";",
+            ",",
+            ",",
+            "!\"6&\",\"??@X,[.cn\";\"?^DtjWY\\+n\",\"?%r`SW2&a7\";\"?uaKRZs,=\";\"?P2C^UuXItg.h0Jg\";\"?U3jZDLuM8T]A\",\"?iF%-aB9=<<B*oS[H87\",\"??M(BIYbh.k.S?le\";\"?^Dt6+?7s/9.h0b\";\"?s],%X\",\"?7W6\",\"?^Dth#",
+            ","
+          ]
+        },
+        {
+          "name": "o",
+          "type": "string-array",
+          "count": 37,
+          "samples": [
+            "^",
+            ")",
+            "",
+            "]=237945+-237863,s=1940580624%9110707;L=-315074--315101;j=-328641--328685;[",
+            "]=1033282185%6339154,F=1270363259%12098697,k=914093837%3856936;p=-334980+334980;[",
+            "]=270858581%14255713;Q=77613177%5970239,V=46637713%613654;[",
+            "]=26972-26943,[",
+            "]=88499095%355418;K=881610281%9688025,["
+          ]
+        },
+        {
+          "name": "w",
+          "type": "string-array",
+          "count": 12,
+          "samples": [
+            "3",
+            "1",
+            "9",
+            "6",
+            "/",
+            "2",
+            "7",
+            "+"
+          ]
+        }
+      ]
+    },
+    "outputBytes": 17906,
+    "progress": {
+      "inputBytes": 21688,
+      "outputBytes": 17906,
+      "reducedBytes": 3782,
+      "staticReductionPercent": 17.4,
+      "sourceStrings": 100,
+      "outputStrings": 58,
+      "encodedStrings": 1,
+      "layers": [
+        {
+          "id": "numeric-constants",
+          "name": "数字常量",
+          "detected": true,
+          "action": "已执行安全整数折叠",
+          "status": "processed"
+        },
+        {
+          "id": "constant-pool",
+          "name": "常量池/字符表",
+          "detected": true,
+          "action": "已提取候选表；动态索引保留",
+          "status": "partial"
+        },
+        {
+          "id": "decoder-pipeline",
+          "name": "解码管线",
+          "detected": false,
+          "action": "已识别 char/byte/gsub/concat 管线",
+          "status": "none"
+        },
+        {
+          "id": "vm-dispatch",
+          "name": "VM 状态分发",
+          "detected": false,
+          "action": "已提取静态状态信息；未执行 VM",
+          "status": "none"
+        },
+        {
+          "id": "dynamic-runtime",
+          "name": "运行时环境依赖",
+          "detected": true,
+          "action": "需要运行时语义，保持原样",
+          "status": "blocked"
+        }
+      ],
+      "detectedLayers": 3,
+      "processedLayers": 1,
+      "remainingLayers": [
+        "常量池/字符表",
+        "运行时环境依赖"
+      ],
+      "nextSteps": [
+        "已提取候选表；动态索引保留",
+        "需要运行时语义，保持原样"
+      ]
+    },
+    "tracePlan": {
+      "mode": "safe-static-trace-plan",
+      "executable": false,
+      "hooks": [
+        {
+          "target": "environment",
+          "purpose": "记录运行环境访问，不注入真实全局表",
+          "risk": "high",
+          "action": "record-only"
+        }
+      ],
+      "entrypoints": [
+        "return(function(...)local U={\"?ue@3R\\'05\",\"?hq\\\"\",\"?^Dt)_\";\"?sHjMp.c6\",\"?uoLLZ7+\",\"?\\'!\\\"6&\",\"??@X,[.cn\";\"?^DtjWY\\\\+n\",\"?%r`SW",
+        "function S(S)return U[S+(-844356+860808)]end for S,L in ipairs({{-64808+64809,476227+-476181},{-22027-(-22028),-258825-(-258832)}",
+        "return(function(o,T,l,I,q,U,Q,K,F,z,w,y,Z,i,L,c,r,H,h,s)H,Z,L,r,i,y,w,z,F,s,c,K,h=function(U,S)local q=h(S)local l=function()r",
+        "return l end,{},function(L,l,Q,T)local j,a,X,i,s,W,x,p,y,d,u,h,m,B,E,N,G,C,g,M,U0,e,O,n,w,A,R,f,k,b,Y,D,I,J,P,v,t,V while L do",
+        "return q(I)end,function(U,S)local q=h(S)local l=function(l,Q,T,o,I)return L(U,{l,Q,T;o;I},S,q)end return l end,function(U)local",
+        "function(U,S)local q=h(S)local l=function(...)return L(U,{...},S,q)end return l end,{},function()s=(-623800-(-623801))+s w[s]=-3",
+        "return s end,function(U,S)local q=h(S)local l=function(l)return L(U,{l},S,q)end return l end,1044534-1044534,function(U)w[U]=w[",
+        "function(U,S)local q=h(S)local l=function(l,Q,T)return L(U,{l,Q,T},S,q)end return l end,function(U)for S=-615287-(-615288),#U,24",
+        "function()return 4218229-844263 end return L else return Q({},{[S(-682529-(-666087))]=i,[S(274230+-290667)]=U,[S(50932+-67359)]=",
+        "function()return 400474+2973492 end})end end return(y(135000+14141065,{}))(q(I))end)(select,getmetatable,newproxy,{...},unpack o"
+      ],
+      "warnings": [
+        "此计划只描述可审计的记录点，不会在服务器或浏览器执行未知 Lua。",
+        "动态解密应在隔离、无网络、无文件写入的 Lua 沙箱中逐项记录并回放。"
+      ],
+      "recommendedOrder": [
+        "environment"
+      ]
+    },
+    "cleanupSuggestions": [
+      {
+        "type": "environment-guard",
+        "action": "review",
+        "reason": "检测到环境或调试完整性检查；需要隔离语义分析后再移除"
+      },
+      {
+        "type": "proxy",
+        "action": "review",
+        "reason": "检测到代理/元表行为；仅删除无副作用的转发层才安全"
+      }
+    ]
+  }
+}
