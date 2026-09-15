@@ -56,4 +56,7 @@ const base64 = deobfuscate(fs.readFileSync(__dirname + '/base64-sample.lua', 'ut
 assert.equal(base64.report.inputBytes > base64.report.outputBytes, true);
 assert.ok(base64.hints.advanced.some(item => item.type === 'base64-codec'));
 assert.equal(base64.hints.advanced.some(item => item.type === 'dynamic-string-decryption'), false);
+assert.ok(base64.report.progress);
+assert.equal(base64.report.progress.inputBytes, base64.report.inputBytes);
+assert.ok(Array.isArray(base64.report.progress.remainingLayers));
 console.log(`Passed ${cases.length + 1} deobfuscator tests`);

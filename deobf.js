@@ -311,6 +311,37 @@ function analyzeVMControlFlow(code) {
   };
 }
 
+function analyzeObfuscationLayers(source, output) {
+  const count = (re, value) => (value.match(re) || []).length;
+  const sourceStrings = count(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, source);
+  const outputStrings = count(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, output);
+  const numericExpressions = count(/\(?-?\d+\s*[+%*/-]\s*\(?-?\d+\)?/g, source);
+  const encodedStrings = count(/(?:\\x[\da-f]{2}|\\\d{1,3}|[A-Za-z0-9+/]{24,}={0,2})/gi, source);
+  const vmKeywords = count(/\b(?:opcode|bytecode|instruction|dispatch|registers?|stack|vm|execute)\b/gi, source);
+  const dynamicCalls = count(/\b(?:loadstring|load|getfenv|setfenv|newproxy|setmetatable)\s*\(/gi, source);
+  const hasPool = /local\s+[A-Za-z_]\w*\s*=\s*\{[\s\S]{80,}\}/.test(source);
+  const hasDecoder = /(?:string\.char|string\.byte|string\.gsub|table\.concat|:find)\s*\(/.test(source);
+  const hasStateMachine = /while\s+(?:true|[A-Za-z_]\w*)\s+do[\s\S]{0,1500}(?:if|elseif)[\s\S]{0,1500}(?:state|step|pc|instruction)/i.test(source);
+  const layers = [
+    { id: 'numeric-constants', name: '数字常量', detected: numericExpressions > 0, action: '已执行安全整数折叠', status: numericExpressions ? 'processed' : 'none' },
+    { id: 'constant-pool', name: '常量池/字符表', detected: hasPool, action: '已提取候选表；动态索引保留', status: hasPool ? 'partial' : 'none' },
+    { id: 'decoder-pipeline', name: '解码管线', detected: hasDecoder, action: '已识别 char/byte/gsub/concat 管线', status: hasDecoder ? 'partial' : 'none' },
+    { id: 'vm-dispatch', name: 'VM 状态分发', detected: hasStateMachine || vmKeywords >= 5, action: '已提取静态状态信息；未执行 VM', status: (hasStateMachine || vmKeywords >= 5) ? 'partial' : 'none' },
+    { id: 'dynamic-runtime', name: '运行时环境依赖', detected: dynamicCalls > 0, action: '需要运行时语义，保持原样', status: dynamicCalls ? 'blocked' : 'none' }
+  ];
+  const detected = layers.filter(layer => layer.detected);
+  return {
+    inputBytes: source.length, outputBytes: output.length,
+    reducedBytes: Math.max(0, source.length - output.length),
+    staticReductionPercent: source.length ? Number(((Math.max(0, source.length - output.length) / source.length) * 100).toFixed(1)) : 0,
+    sourceStrings, outputStrings, encodedStrings, layers,
+    detectedLayers: detected.length,
+    processedLayers: detected.filter(layer => layer.status === 'processed').length,
+    remainingLayers: detected.filter(layer => layer.status !== 'processed').map(layer => layer.name),
+    nextSteps: layers.filter(layer => layer.status === 'partial' || layer.status === 'blocked').map(layer => layer.action)
+  };
+}
+
 /* ═══════════════════════════════════════════════
  *  ⑥ 字符串表提取
  * ═══════════════════════════════════════════════ */
@@ -608,6 +639,7 @@ function deobfuscate(source) {
     }
 
     report.outputBytes = code.length;
+    report.progress = analyzeObfuscationLayers(source, code);
 
     // 生成总结
     const changedPhases = report.phases.filter(p => p.changed).map(p => p.name);
@@ -639,4 +671,4 @@ function deobfuscate(source) {
   }
 }
 
-module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, detectAdvancedObfuscation, analyzeVMControlFlow };
+module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeObfuscationLayers };
