@@ -1,149 +1,1091 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>10ms-deobf - Prometheus Lua 去混淆</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0f0f12;
-      color: #e4e4e7;
-      min-height: 100vh;
-      padding: 24px;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10ms-deobf · Lua 反混淆工具</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:        #0d1117;
+    --panel:     #161b22;
+    --panel-2:   #1c2128;
+    --border:    #30363d;
+    --border-2:  #21262d;
+    --text:      #c9d1d9;
+    --text-dim:  #8b949e;
+    --text-mute: #484f58;
+    --accent:    #58a6ff;
+    --accent-2:  #79c0ff;
+    --green:     #3fb950;
+    --red:       #f85149;
+    --yellow:    #d29922;
+    --purple:    #bc8cff;
+    --cyan:      #39d0d8;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Microsoft YaHei", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ─── 顶栏 ─── */
+  header {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .logo {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo .mark {
+    width: 26px;
+    height: 26px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    font-size: 15px;
+    color: #0d1117;
+    font-weight: 900;
+  }
+
+  .logo .name span { color: var(--accent); }
+
+  .badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(88,166,255,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,0.28);
+    font-weight: 500;
+  }
+
+  .badge.purple {
+    background: rgba(188,140,255,0.12);
+    color: var(--purple);
+    border-color: rgba(188,140,255,0.28);
+  }
+
+  .badge.green {
+    background: rgba(63,185,80,0.12);
+    color: var(--green);
+    border-color: rgba(63,185,80,0.28);
+  }
+
+  .badge.yellow {
+    background: rgba(210,153,34,0.12);
+    color: var(--yellow);
+    border-color: rgba(210,153,34,0.28);
+  }
+
+  .header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-mute);
+    margin-right: 5px;
+    vertical-align: middle;
+    transition: background .3s;
+  }
+  .dot.on  { background: var(--green); box-shadow: 0 0 8px rgba(63,185,80,.6); }
+  .dot.off { background: var(--red); }
+
+  /* ─── 工具栏 ─── */
+  .toolbar {
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .group-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: var(--text-mute);
+    margin-right: 2px;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-dim);
+    cursor: pointer;
+    user-select: none;
+    transition: color .15s;
+  }
+  .option:hover { color: var(--text); }
+  .option input[type="checkbox"] {
+    accent-color: var(--accent);
+    cursor: pointer;
+    width: 14px;
+    height: 14px;
+  }
+  .option input[type="radio"] {
+    accent-color: var(--accent);
+    cursor: pointer;
+    width: 13px;
+    height: 13px;
+  }
+
+  .divider {
+    width: 1px;
+    height: 18px;
+    background: var(--border);
+    margin: 0 2px;
+  }
+
+  .spacer { flex: 1; }
+
+  /* ─── 按钮 ─── */
+  button {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #21262d;
+    color: var(--text);
+    cursor: pointer;
+    transition: all .15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  button:hover:not(:disabled) { background: #30363d; border-color: #8b949e; }
+  button:active:not(:disabled) { transform: translateY(1px); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+
+  button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0d1117;
+  }
+  button.primary:hover:not(:disabled) {
+    background: var(--accent-2);
+    border-color: var(--accent-2);
+  }
+
+  button.ghost {
+    background: transparent;
+    border-color: transparent;
+    color: var(--text-dim);
+    padding: 6px 10px;
+  }
+  button.ghost:hover:not(:disabled) {
+    background: var(--panel-2);
+    border-color: var(--border);
+    color: var(--text);
+  }
+
+  /* ─── 主区域 ─── */
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    min-height: 0;
+  }
+
+  .pane {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .pane-head {
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--panel);
+    flex-shrink: 0;
+    min-height: 38px;
+  }
+
+  .pane-head .icon { color: var(--accent); font-size: 13px; }
+
+  .pane-head .meta {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-left: auto;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .pane-head .meta .chip {
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--panel-2);
+    border: 1px solid var(--border-2);
+    font-size: 11px;
+  }
+
+  .pane-head .meta .chip.ok   { color: var(--green); border-color: rgba(63,185,80,.4); background: rgba(63,185,80,.08); }
+  .pane-head .meta .chip.warn { color: var(--yellow); border-color: rgba(210,153,34,.4); background: rgba(210,153,34,.08); }
+  .pane-head .meta .chip.err  { color: var(--red); border-color: rgba(248,81,73,.4); background: rgba(248,81,73,.08); }
+
+  textarea {
+    flex: 1;
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--bg);
+    color: var(--text);
+    border: none;
+    outline: none;
+    resize: none;
+    font-family: "SF Mono", ui-monospace, Monaco, "Cascadia Code",
+                 "Roboto Mono", Consolas, "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.65;
+    tab-size: 2;
+    overflow: auto;
+  }
+
+  textarea::placeholder { color: var(--text-mute); }
+
+  #output { background: #0a0d12; }
+
+  /* ─── 底部信息区 ─── */
+  .info {
+    border-top: 1px solid var(--border);
+    background: var(--panel);
+    flex-shrink: 0;
+    max-height: 40vh;
+    overflow: hidden;
+    display: none;
+  }
+  .info.show { display: flex; }
+
+  .info-tabs {
+    display: flex;
+    border-right: 1px solid var(--border);
+    background: var(--panel-2);
+    flex-direction: column;
+    min-width: 130px;
+    padding: 6px;
+    gap: 2px;
+  }
+
+  .info-tab {
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 5px;
+    user-select: none;
+    transition: all .12s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    background: none;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+  }
+  .info-tab:hover { background: var(--border-2); color: var(--text); }
+  .info-tab.active {
+    background: var(--accent);
+    color: #0d1117;
+  }
+  .info-tab .cnt {
+    margin-left: auto;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.1);
+    font-weight: 700;
+  }
+  .info-tab.active .cnt { background: rgba(0,0,0,.2); }
+
+  .info-body {
+    flex: 1;
+    overflow: auto;
+    padding: 14px 18px;
+    font-family: "SF Mono", ui-monospace, Monaco, Consolas, monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    min-height: 0;
+  }
+
+  .info-body[data-tab="log"] { padding: 12px 16px; }
+
+  /* 日志行 */
+  .log-line {
+    color: var(--text-dim);
+    padding: 1px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .log-line .t { color: var(--text-mute); margin-right: 10px; }
+  .log-line.ok  { color: var(--green); }
+  .log-line.warn{ color: var(--yellow); }
+  .log-line.err { color: var(--red); }
+  .log-line.info{ color: var(--cyan); }
+
+  /* 报告表 */
+  .report-hint {
+    color: var(--text-mute);
+    font-style: italic;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .kv {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 6px 16px;
+    font-size: 12.5px;
+  }
+  .kv dt { color: var(--text-dim); }
+  .kv dd { color: var(--text); word-break: break-all; }
+
+  .phase-row {
+    display: flex;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--border-2);
+    gap: 12px;
+  }
+  .phase-row:last-child { border-bottom: none; }
+  .phase-name { color: var(--text); min-width: 140px; }
+  .phase-change {
+    font-weight: 700;
+    color: var(--text-mute);
+    min-width: 60px;
+    text-align: right;
+  }
+  .phase-change.on { color: var(--green); }
+  .phase-change.off { color: var(--text-mute); }
+
+  .bar {
+    flex: 1;
+    height: 4px;
+    background: var(--border-2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .bar > i {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width .3s;
+  }
+  .bar.on > i { background: var(--green); }
+
+  /* 加密检测卡片 */
+  .enc-card {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: var(--panel-2);
+  }
+  .enc-card .enc-type {
+    font-weight: 700;
+    color: var(--yellow);
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+  .enc-card .enc-desc {
+    color: var(--text-dim);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  /* 字符串表卡片 */
+  .st-card {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: var(--panel-2);
+  }
+  .st-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .st-name { color: var(--cyan); font-weight: 700; }
+  .st-badge {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    background: rgba(88,166,255,.15);
+    color: var(--accent);
+  }
+  .st-samples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .st-item {
+    background: #0a0d12;
+    border: 1px solid var(--border-2);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11.5px;
+    color: var(--text-dim);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ─── 滚动条 ─── */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 5px;
+    border: 2px solid var(--bg);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+  /* ─── Toast ─── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.5);
+    opacity: 0;
+    transition: all .3s cubic-bezier(.4,0,.2,1);
+    pointer-events: none;
+    z-index: 9999;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ─── 响应式 ─── */
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+    .toolbar { gap: 10px; padding: 8px 14px; }
+    .info { max-height: 50vh; }
+    .info-tabs {
+      flex-direction: row;
+      min-width: 0;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
     }
-    .container { max-width: 1100px; margin: 0 auto; }
-    h1 { font-size: 1.8rem; margin-bottom: 8px; color: #a78bfa; }
-    .sub { color: #a1a1aa; margin-bottom: 24px; font-size: 0.95rem; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
-    textarea {
-      width: 100%;
-      height: 380px;
-      background: #18181b;
-      border: 1px solid #3f3f46;
-      border-radius: 10px;
-      color: #e4e4e7;
-      padding: 14px;
-      font-family: 'Cascadia Code', 'Fira Code', monospace;
-      font-size: 13px;
-      resize: vertical;
-      line-height: 1.5;
-    }
-    textarea:focus { outline: none; border-color: #8b5cf6; }
-    .actions { margin: 16px 0; display: flex; gap: 12px; flex-wrap: wrap; }
-    button {
-      background: #7c3aed;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-    }
-    button:hover { background: #6d28d9; }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .secondary { background: #27272a; }
-    .secondary:hover { background: #3f3f46; }
-    .status { margin-top: 12px; font-size: 0.9rem; color: #a1a1aa; }
-    .hint {
-      margin-top: 20px;
-      background: #18181b;
-      border: 1px solid #3f3f46;
-      border-radius: 10px;
-      padding: 14px;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-    .hint code { background: #27272a; padding: 2px 6px; border-radius: 4px; }
-  </style>
+    .info { flex-direction: column; }
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>10ms-deobf</h1>
-    <p class="sub">最简 Prometheus / WeAreDevs 风格 Roblox Lua 去混淆 · 可连接 API</p>
 
-    <div class="grid">
-      <div>
-        <label style="display:block;margin-bottom:6px;color:#a1a1aa;">混淆代码</label>
-        <textarea id="input" placeholder="粘贴 Prometheus 混淆后的 Lua 代码..."></textarea>
+<!-- ═══ 顶栏 ═══ -->
+<header>
+  <div class="logo">
+    <div class="mark">10</div>
+    <div class="name">ms<span>-deobf</span></div>
+  </div>
+  <span class="badge">v2.0.0</span>
+  <span class="badge purple">Lua / Roblox</span>
+
+  <div class="header-right">
+    <span id="status"><span class="dot off" id="status-dot"></span>检查服务…</span>
+  </div>
+</header>
+
+<!-- ═══ 工具栏 ═══ -->
+<div class="toolbar">
+  <span class="group-label">输出</span>
+  <label class="option"><input type="radio" name="verbose" value="0"> 精简</label>
+  <label class="option"><input type="radio" name="verbose" value="1" checked> 标准</label>
+  <label class="option"><input type="radio" name="verbose" value="2"> 完整</label>
+
+  <div class="divider"></div>
+
+  <span class="group-label">快捷</span>
+  <button class="ghost" id="btn-sample" title="载入示例">📄 示例</button>
+  <button class="ghost" id="btn-prom" title="载入 Prometheus 样本">🔥 Prometheus</button>
+  <button class="ghost" id="btn-luraph" title="载入 Luraph 样本">🌙 Luraph</button>
+
+  <div class="spacer"></div>
+
+  <button id="btn-clear" class="ghost" title="清空全部">🗑 清空</button>
+  <button id="btn-copy" title="复制反混淆结果">📋 复制</button>
+  <button id="btn-download" title="下载结果 .lua">⬇ 下载</button>
+  <button id="btn-run" class="primary" title="Ctrl + Enter">⚡ 反混淆</button>
+</div>
+
+<!-- ═══ 主区域 ═══ -->
+<main>
+  <div class="pane">
+    <div class="pane-head">
+      <span class="icon">▸</span>
+      <span>输入 · 混淆代码</span>
+      <div class="meta">
+        <span class="chip" id="in-lines">0 行</span>
+        <span class="chip" id="in-size">0 B</span>
       </div>
-      <div>
-        <label style="display:block;margin-bottom:6px;color:#a1a1aa;">去混淆结果</label>
-        <textarea id="output" readonly placeholder="结果会显示在这里..."></textarea>
-      </div>
     </div>
+    <textarea id="input" spellcheck="false"
+      placeholder="在此粘贴混淆后的 Lua 代码...
+支持 Prometheus / Luraph / MoonSec / IronBrew 等
 
-    <div class="actions">
-      <button id="runBtn">去混淆</button>
-      <button class="secondary" id="clearBtn">清空</button>
-      <button class="secondary" id="copyBtn">复制结果</button>
-    </div>
-
-    <div class="status" id="status">就绪</div>
-
-    <div class="hint">
-      <strong>API 用法（任何语言都能连）：</strong><br>
-      <code>POST /deobf</code><br>
-      Body JSON: <code>{ "code": "你的混淆代码" }</code><br>
-      或直接发纯文本。<br><br>
-      当前版本只做：数字转义解码 + 常见包装清理 + 基础美化。
-    </div>
+快捷键：Ctrl + Enter 开始反混淆"></textarea>
   </div>
 
-  <script>
-    const input = document.getElementById('input');
-    const output = document.getElementById('output');
-    const status = document.getElementById('status');
-    const runBtn = document.getElementById('runBtn');
-    const API = '/deobf';
+  <div class="pane">
+    <div class="pane-head">
+      <span class="icon">▸</span>
+      <span>输出 · 反混淆结果</span>
+      <div class="meta">
+        <span class="chip" id="out-size">等待处理</span>
+        <span class="chip" id="out-time"></span>
+        <span class="chip" id="out-obf"></span>
+      </div>
+    </div>
+    <textarea id="output" spellcheck="false" readonly
+      placeholder="结果将显示在这里..."></textarea>
+  </div>
+</main>
 
-    runBtn.addEventListener('click', async () => {
-      const code = input.value.trim();
-      if (!code) {
-        status.textContent = '请先粘贴代码';
-        return;
-      }
-      runBtn.disabled = true;
-      status.textContent = '处理中...';
-      try {
-        const res = await fetch(API, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code })
-        });
-        const data = await res.json();
-        if (data.success) {
-          output.value = data.deobfuscated || '';
-          status.textContent = data.message || '完成';
-          if (data.hints && data.hints.stringTable) {
-            status.textContent += ` | 检测到字符串表: ${data.hints.stringTable.count} 个字符串`;
-          }
-        } else {
-          output.value = '';
-          status.textContent = data.message || '失败';
-        }
-      } catch (e) {
-        status.textContent = '请求失败: ' + e.message;
-      } finally {
-        runBtn.disabled = false;
-      }
+<!-- ═══ 底部信息面板 ═══ -->
+<div class="info" id="info">
+  <div class="info-tabs">
+    <button class="info-tab active" data-tab="log">📋 日志 <span class="cnt" id="cnt-log">0</span></button>
+    <button class="info-tab" data-tab="phases">⚙ 阶段 <span class="cnt" id="cnt-phases">0</span></button>
+    <button class="info-tab" data-tab="encryption">🔐 加密 <span class="cnt" id="cnt-encryption">0</span></button>
+    <button class="info-tab" data-tab="tables">📚 字符串表 <span class="cnt" id="cnt-tables">0</span></button>
+    <button class="info-tab" data-tab="raw">🧾 原始报告</button>
+  </div>
+  <div class="info-body" id="info-body" data-tab="log"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════
+ *  状态
+ * ═══════════════════════════════════════════════ */
+const state = {
+  logs: [],
+  lastResult: null,
+  currentTab: 'log'
+};
+
+/* ═══════════════════════════════════════════════
+ *  元素
+ * ═══════════════════════════════════════════════ */
+const $ = (id) => document.getElementById(id);
+const $input       = $('input');
+const $output      = $('output');
+const $inLines     = $('in-lines');
+const $inSize      = $('in-size');
+const $outSize     = $('out-size');
+const $outTime     = $('out-time');
+const $outObf      = $('out-obf');
+const $info        = $('info');
+const $infoBody    = $('info-body');
+const $toast       = $('toast');
+const $statusDot   = $('status-dot');
+const $status      = $('status');
+
+/* ═══════════════════════════════════════════════
+ *  工具
+ * ═══════════════════════════════════════════════ */
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+function fmtBytes(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+  return (n / 1024 / 1024).toFixed(2) + ' MB';
+}
+
+function countLines(s) {
+  if (!s) return 0;
+  return s.split('\n').length;
+}
+
+let toastTimer = null;
+function toast(msg, type = '') {
+  $toast.textContent = msg;
+  $toast.style.borderColor =
+    type === 'ok' ? 'rgba(63,185,80,.5)' :
+    type === 'err' ? 'rgba(248,81,73,.5)' : '';
+  $toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $toast.classList.remove('show'), 1800);
+}
+
+/* ═══════════════════════════════════════════════
+ *  日志
+ * ═══════════════════════════════════════════════ */
+function log(msg, type = '') {
+  const t = new Date().toLocaleTimeString('en-GB', { hour12: false });
+  state.logs.push({ t, msg, type });
+  if (state.currentTab === 'log') renderLog();
+  $('cnt-log').textContent = state.logs.length;
+}
+
+function renderLog() {
+  const html = state.logs.map((l) =>
+    `<div class="log-line ${l.type}"><span class="t">${l.t}</span>${escapeHtml(l.msg)}</div>`
+  ).join('');
+  $infoBody.innerHTML = html || '<div class="report-hint">暂无日志</div>';
+  $infoBody.scrollTop = $infoBody.scrollHeight;
+}
+
+function clearLog() {
+  state.logs = [];
+  $('cnt-log').textContent = '0';
+  if (state.currentTab === 'log') renderLog();
+}
+
+/* ═══════════════════════════════════════════════
+ *  输入统计
+ * ═══════════════════════════════════════════════ */
+function updateInputStats() {
+  const v = $input.value;
+  $inLines.textContent = countLines(v) + ' 行';
+  $inSize.textContent = fmtBytes(new Blob([v]).size);
+}
+
+$input.addEventListener('input', updateInputStats);
+
+/* ═══════════════════════════════════════════════
+ *  选项卡
+ * ═══════════════════════════════════════════════ */
+document.querySelectorAll('.info-tab').forEach((tab) => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.info-tab').forEach((t) => t.classList.remove('active'));
+    tab.classList.add('active');
+    state.currentTab = tab.dataset.tab;
+    $infoBody.dataset.tab = state.currentTab;
+    renderTab();
+  });
+});
+
+function renderTab() {
+  const tab = state.currentTab;
+  if (tab === 'log') return renderLog();
+  if (tab === 'phases') return renderPhases();
+  if (tab === 'encryption') return renderEncryption();
+  if (tab === 'tables') return renderTables();
+  if (tab === 'raw') return renderRaw();
+}
+
+/* ─── 阶段面板 ─── */
+function renderPhases() {
+  const r = state.lastResult;
+  const phases = r?.stats?.phases || r?.report?.phases;
+  if (!phases || !phases.length) {
+    $infoBody.innerHTML = '<div class="report-hint">尚无阶段数据，先运行一次反混淆</div>';
+    return;
+  }
+
+  const maxChange = Math.max(1, ...phases.map((p) => p.changed || 0));
+
+  let html = '<div>';
+  for (const p of phases) {
+    const change = p.changed || 0;
+    const pct = Math.max(2, (change / maxChange) * 100);
+    const cls = change > 0 ? 'on' : '';
+    const detail = p.detail
+      ? ' ' + Object.entries(p.detail)
+          .filter(([, v]) => v > 0)
+          .map(([k, v]) => `${k}:${v}`)
+          .join(' ')
+      : '';
+    html += `
+      <div class="phase-row">
+        <span class="phase-name">${escapeHtml(p.name)}</span>
+        <div class="bar ${cls}"><i style="width:${change > 0 ? pct : 0}%"></i></div>
+        <span class="phase-change ${change > 0 ? 'on' : 'off'}">
+          ${change > 0 ? '+' + change : '—'}
+        </span>
+      </div>
+      ${detail ? `<div style="color:var(--text-mute);font-size:11px;padding-left:10px;margin-bottom:4px">${escapeHtml(detail.trim())}</div>` : ''}
+    `;
+  }
+  html += '</div>';
+
+  // 汇总
+  const stats = r.stats || r.report || {};
+  html += '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">';
+  html += '<dl class="kv">';
+  html += `<dt>输入大小</dt><dd>${fmtBytes(stats.inputBytes || 0)}</dd>`;
+  html += `<dt>输出大小</dt><dd>${fmtBytes(stats.outputBytes || 0)}</dd>`;
+  if (stats.elapsedMs != null) html += `<dt>耗时</dt><dd>${stats.elapsedMs} ms</dd>`;
+  if (r.hints?.obfuscator) html += `<dt>识别混淆器</dt><dd style="color:var(--purple)">${escapeHtml(r.hints.obfuscator)}</dd>`;
+  html += '</dl></div>';
+
+  $infoBody.innerHTML = html;
+}
+
+/* ─── 加密检测 ─── */
+function renderEncryption() {
+  const r = state.lastResult;
+  const enc = r?.hints?.encryption;
+  if (!enc || !enc.length) {
+    $infoBody.innerHTML = '<div class="report-hint">未检测到加密逻辑，或尚未运行反混淆</div>';
+    return;
+  }
+
+  const html = enc.map((e) => `
+    <div class="enc-card">
+      <div class="enc-type">⚠ ${escapeHtml(e.type)}</div>
+      <div class="enc-desc">${escapeHtml(e.desc)}</div>
+    </div>
+  `).join('');
+
+  $infoBody.innerHTML = html +
+    '<div style="margin-top:14px;padding:10px 12px;border-radius:6px;' +
+    'background:rgba(210,153,34,.06);border:1px solid rgba(210,153,34,.25);' +
+    'font-size:12px;color:var(--yellow);line-height:1.6">' +
+    '💡 提示：这类加密需要实现对应 PRNG / XOR 算法才能静态还原。' +
+    '当前版本已完成结构层剥离，字符串解密将在后续版本支持。</div>';
+}
+
+/* ─── 字符串表 ─── */
+function renderTables() {
+  const r = state.lastResult;
+  const tables = r?.hints?.stringTables;
+  if (!tables || !tables.length) {
+    $infoBody.innerHTML = '<div class="report-hint">未提取到字符串表，或尚未运行反混淆</div>';
+    return;
+  }
+
+  const html = tables.map((t) => `
+    <div class="st-card">
+      <div class="st-head">
+        <span class="st-name">${escapeHtml(t.name)}</span>
+        <span class="st-badge">${t.type}</span>
+        <span class="st-badge">${t.count} 项</span>
+      </div>
+      <div class="st-samples">
+        ${t.samples.map((s) => `<span class="st-item">${escapeHtml(
+          typeof s === 'string' ? JSON.stringify(s) : String(s)
+        )}</span>`).join('')}
+        ${t.count > t.samples.length ? `<span class="st-item" style="color:var(--text-mute)">… 还有 ${t.count - t.samples.length} 项</span>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  $infoBody.innerHTML = html;
+}
+
+/* ─── 原始报告 ─── */
+function renderRaw() {
+  const r = state.lastResult;
+  if (!r) {
+    $infoBody.innerHTML = '<div class="report-hint">尚无数据</div>';
+    return;
+  }
+  $infoBody.innerHTML = `<pre style="white-space:pre-wrap;word-break:break-word;margin:0">${
+    escapeHtml(JSON.stringify(r, null, 2))
+  }</pre>`;
+}
+
+/* ═══════════════════════════════════════════════
+ *  反混淆调用
+ * ═══════════════════════════════════════════════ */
+async function runDeobfuscate() {
+  const code = $input.value.trim();
+  if (!code) { toast('输入为空', 'err'); return; }
+
+  const verbose = document.querySelector('input[name="verbose"]:checked').value;
+
+  $('btn-run').disabled = true;
+  $('btn-run').textContent = '处理中…';
+  clearLog();
+  log('▸ 开始反混淆（verbose=' + verbose + '）', 'info');
+  showInfo();
+
+  const t0 = performance.now();
+  try {
+    const resp = await fetch('/deobf?verbose=' + verbose, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
     });
 
-    document.getElementById('clearBtn').addEventListener('click', () => {
-      input.value = '';
-      output.value = '';
-      status.textContent = '已清空';
-    });
+    const data = await resp.json();
+    const elapsed = Math.round(performance.now() - t0);
 
-    document.getElementById('copyBtn').addEventListener('click', () => {
-      if (!output.value) return;
-      navigator.clipboard.writeText(output.value).then(() => {
-        status.textContent = '已复制到剪贴板';
-      });
-    });
-  </script>
+    if (!resp.ok && !data.success) {
+      log('✗ 服务返回错误：' + (data.message || resp.status), 'err');
+      $outSize.textContent = '处理失败';
+      $outSize.className = 'chip err';
+      toast(data.message || '处理失败', 'err');
+      return;
+    }
+
+    state.lastResult = data;
+    $output.value = data.deobfuscated || '';
+
+    // 输出区统计
+    const outBytes = new Blob([data.deobfuscated || '']).size;
+    $outSize.textContent = fmtBytes(outBytes);
+    $outSize.className = 'chip ok';
+    $outTime.textContent = elapsed + ' ms';
+
+    if (data.hints?.obfuscator) {
+      $outObf.textContent = data.hints.obfuscator;
+      $outObf.className = 'chip';
+      $outObf.style.color = 'var(--purple)';
+      $outObf.style.borderColor = 'rgba(188,140,255,.4)';
+    } else {
+      $outObf.textContent = '';
+      $outObf.className = 'chip';
+      $outObf.style.color = '';
+      $outObf.style.borderColor = '';
+    }
+
+    // 日志：阶段结果
+    const phases = data.stats?.phases || data.report?.phases || [];
+    for (const p of phases) {
+      const change = p.changed || 0;
+      log(`  ${change > 0 ? '✓' : '·'} ${p.name}${change > 0 ? '：' + change : ''}`,
+          change > 0 ? 'ok' : '');
+    }
+
+    // 加密检测
+    const enc = data.hints?.encryption;
+    if (enc && enc.length) {
+      log(`⚠ 检测到 ${enc.length} 处加密逻辑（详见「加密」标签）`, 'warn');
+    }
+
+    // 字符串表
+    const tables = data.hints?.stringTables;
+    if (tables && tables.length) {
+      log(`📚 提取到 ${tables.length} 个字符串表`, 'info');
+    }
+
+    log(`✓ 完成，服务端 ${elapsed}ms`, 'ok');
+    toast('反混淆完成', 'ok');
+
+    // 更新计数器
+    $('cnt-phases').textContent = phases.length;
+    $('cnt-encryption').textContent = enc ? enc.length : 0;
+    $('cnt-tables').textContent = tables ? tables.length : 0;
+
+    renderTab();
+  } catch (err) {
+    log('✗ 请求失败：' + err.message, 'err');
+    toast('请求失败', 'err');
+    $outSize.textContent = '网络错误';
+    $outSize.className = 'chip err';
+  } finally {
+    $('btn-run').disabled = false;
+    $('btn-run').textContent = '⚡ 反混淆';
+  }
+}
+
+function showInfo() {
+  $info.classList.add('show');
+}
+
+/* ═══════════════════════════════════════════════
+ *  按钮
+ * ═══════════════════════════════════════════════ */
+$('btn-run').addEventListener('click', runDeobfuscate);
+
+$('btn-clear').addEventListener('click', () => {
+  $input.value = '';
+  $output.value = '';
+  state.lastResult = null;
+  $inLines.textContent = '0 行';
+  $inSize.textContent = '0 B';
+  $outSize.textContent = '等待处理';
+  $outSize.className = 'chip';
+  $outTime.textContent = '';
+  $outObf.textContent = '';
+  $('cnt-phases').textContent = '0';
+  $('cnt-encryption').textContent = '0';
+  $('cnt-tables').textContent = '0';
+  clearLog();
+  $info.classList.remove('show');
+  toast('已清空');
+});
+
+$('btn-copy').addEventListener('click', async () => {
+  if (!$output.value) { toast('无可复制内容'); return; }
+  try {
+    await navigator.clipboard.writeText($output.value);
+    toast('已复制到剪贴板', 'ok');
+  } catch (e) {
+    toast('复制失败', 'err');
+  }
+});
+
+$('btn-download').addEventListener('click', () => {
+  if (!$output.value) { toast('无可下载内容'); return; }
+  const blob = new Blob([$output.value], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'deobfuscated_' + Date.now() + '.lua';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('已下载 .lua 文件', 'ok');
+});
+
+/* ─── 示例 ─── */
+$('btn-sample').addEventListener('click', () => {
+  setInput(`return (function()
+  --[[ 简单示例：转义 + string.char + 包装 ]]
+  local a = "\\x48\\x65\\x6c\\x6c\\x6f"
+  local b = string.char(32, 87, 111, 114, 108, 100)
+  local c = "\\72\\101\\108\\108\\111"
+  print(a .. b)
+end)()`);
+  toast('已载入示例');
+});
+
+$('btn-prom').addEventListener('click', () => {
+  setInput(`-- Prometheus 特征样本（结构示意）
+-- https://prometheus.dev
+local _0x1a2b = {"\\x48\\x65\\x6c\\x6c\\x6f", "\\x57\\x6f\\x72\\x6c\\x64",
+                 "\\x50\\x72\\x6f", "\\x6d\\x65", "\\x74", "\\x68", "\\x65",
+                 "\\x75", "\\x73", "\\x21"}
+local _0x3c4d = (1 * 1103515245 + 12345) % 2147483648
+local _0x5e6f = string.char(72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100)
+local _0x7a8b = getfenv()[string.char(112,114,105,110,116)]
+return (function()
+  _0x7a8b(_0x5e6f)
+end)()`);
+  toast('已载入 Prometheus 样本');
+});
+
+$('btn-luraph').addEventListener('click', () => {
+  setInput(`-- Luraph 特征样本
+-- LPH_0A1B2C3D
+do
+  local LPH_A1B2 = {"\\72\\101\\97\\108", "\\76\\117\\97\\112\\104", "\\111\\107"}
+  local f = function(s)
+    return s
+  end
+  print(f("\\x48\\x65\\x6c\\x6c\\x6f"))
+end`);
+  toast('已载入 Luraph 样本');
+});
+
+function setInput(text) {
+  $input.value = text;
+  updateInputStats();
+}
+
+/* ═══════════════════════════════════════════════
+ *  快捷键
+ * ═══════════════════════════════════════════════ */
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    runDeobfuscate();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    $input.focus();
+    $input.select();
+  }
+});
+
+/* ═══════════════════════════════════════════════
+ *  服务健康检查
+ * ═══════════════════════════════════════════════ */
+async function checkHealth() {
+  try {
+    const r = await fetch('/health', { cache: 'no-store' });
+    if (!r.ok) throw new Error('bad status');
+    const j = await r.json();
+    $statusDot.className = 'dot on';
+    const up = Math.floor(j.uptime || 0);
+    $status.innerHTML =
+      `<span class="dot on"></span>服务在线 · 运行 ${up}s`;
+  } catch {
+    $statusDot.className = 'dot off';
+    $status.innerHTML = '<span class="dot off"></span>服务离线';
+  }
+}
+
+/* ═══════════════════════════════════════════════
+ *  初始化
+ * ═══════════════════════════════════════════════ */
+log('10ms-deobf v2.0.0 已就绪', 'info');
+log('支持：Prometheus / Luraph / MoonSec / IronBrew', '');
+log('快捷键：Ctrl+Enter 运行 · Ctrl+K 全选输入', '');
+$('cnt-log').textContent = state.logs.length;
+
+checkHealth();
+setInterval(checkHealth, 30000);
+updateInputStats();
+</script>
+
 </body>
 </html>
