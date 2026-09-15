@@ -32,6 +32,13 @@ function decodeEscapes(code) {
   const stats = { decimal: 0, hex: 0, unicode: 0, brace: 0 };
   let out = code;
 
+  // Lua 常用短转义，放在数值转义之前，避免误伤已解码内容。
+  const shortEscapes = { n: '\n', r: '\r', t: '\t', b: '\b', f: '\f', v: '\v', a: '\x07' };
+  out = out.replace(/\\([nrtbfva\\"'])/g, (full, key) => {
+    if (key === '\\' || key === '"' || key === "'") return key;
+    return shortEscapes[key];
+  });
+
   // \xHH
   out = out.replace(/\\x([0-9a-fA-F]{2})/g, (_, h) => {
     stats.hex++;
@@ -345,7 +352,6 @@ function formatLua(code) {
     const untils = (line.match(/\buntil\b/g) || []).length;
     indent = Math.max(0, indent + opens - ends - untils);
 
-    if (/\b(then|do)\s*$/.test(line) && !/\bend\b/.test(line)) indent++;
     if (/^(else|elseif)\b/.test(line)) indent++;
   }
 
@@ -356,7 +362,7 @@ function formatLua(code) {
  *  主流程
  * ═══════════════════════════════════════════════ */
 function deobfuscate(source) {
-  if (!source || typeof source !== 'string') {
+  if (typeof source !== 'string' || !source.trim()) {
     return {
       success: false,
       deobfuscated: '',
@@ -472,4 +478,4 @@ function deobfuscate(source) {
   }
 }
 
-module.exports = { deobfuscate };
+module.exports = { deobfuscate, decodeEscapes, formatLua };

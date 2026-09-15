@@ -13,7 +13,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const NODE_ENV = process.env.NODE_ENV || 'development';
-const MAX_BODY = process.env.MAX_BODY || '5mb';
+const MAX_CODE_LENGTH = Number.parseInt(process.env.MAX_CODE_LENGTH || '5000000', 10);
+const MAX_BATCH_ITEMS = Number.parseInt(process.env.MAX_BATCH_ITEMS || '20', 10);
 
 /* ═══════════════════════════════════════════════
  *  中间件
@@ -27,9 +28,9 @@ app.use(cors({
 }));
 
 // Body 解析
-app.use(express.json({ limit: MAX_BODY }));
-app.use(express.text({ type: ['text/plain', 'text/*'], limit: MAX_BODY }));
-app.use(express.urlencoded({ extended: true, limit: MAX_BODY }));
+app.use(express.json({ limit: `${MAX_CODE_LENGTH}b` }));
+app.use(express.text({ type: ['text/plain', 'text/*'], limit: `${MAX_CODE_LENGTH}b` }));
+app.use(express.urlencoded({ extended: true, limit: `${MAX_CODE_LENGTH}b` }));
 
 // 请求日志
 app.use((req, res, next) => {
@@ -52,7 +53,7 @@ const RATE_LIMIT = 60;
 const RATE_WINDOW = 60 * 1000;
 
 function rateLimit(req, res, next) {
-  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  const ip = req.socket.remoteAddress || 'unknown';
   const now = Date.now();
   const entry = rateStore.get(ip) || { count: 0, reset: now + RATE_WINDOW };
 
@@ -124,6 +125,14 @@ function extractCode(req) {
   return null;
 }
 
+function validateCode(code) {
+  if (typeof code !== 'string' || !code.trim()) return '未提供有效的 Lua 代码';
+  if (code.length > MAX_CODE_LENGTH) {
+    return `代码过长（>${Math.floor(MAX_CODE_LENGTH / 1_000_000)}MB），请拆分后重试`;
+  }
+  return null;
+}
+
 function slimResult(result) {
   // 精简返回（去掉 report/hints 的详细阶段数据）
   return {
@@ -187,18 +196,19 @@ app.get('/api', (req, res) => res.json(apiInfo()));
 // ── 核心：POST /deobf ─────────────────────────
 app.post('/deobf', rateLimit, (req, res) => {
   const extracted = extractCode(req);
+  const validationError = validateCode(extracted && extracted.code);
 
-  if (!extracted || !extracted.code) {
+  if (validationError) {
     return res.status(400).json({
       success: false,
-      message: '未提供代码。请使用 JSON { "code": "..." }、纯文本 body 或 ?code= 参数'
+      message: `${validationError}。请使用 JSON { "code": "..." }、纯文本 body 或 ?code= 参数`
     });
   }
 
-  if (extracted.code.length > 5_000_000) {
+  if (extracted.code.length > MAX_CODE_LENGTH) {
     return res.status(413).json({
       success: false,
-      message: '代码过长（>5MB），请拆分后重试'
+      message: `代码过长（>${Math.floor(MAX_CODE_LENGTH / 1_000_000)}MB），请拆分后重试`
     });
   }
 
@@ -220,9 +230,11 @@ app.post('/deobf', rateLimit, (req, res) => {
 // ── GET /deobf ────────────────────────────────
 app.get('/deobf', rateLimit, (req, res) => {
   const code = req.query.code || '';
-  if (!code) {
+  const validationError = validateCode(code);
+  if (validationError && !code) {
     return res.status(400).json({ success: false, message: '缺少 code 参数' });
   }
+  if (validationError) return res.status(413).json({ success: false, message: validationError });
   try {
     const result = deobfuscate(code);
     const slim = req.query.slim === '1';
@@ -235,7 +247,8 @@ app.get('/deobf', rateLimit, (req, res) => {
 // ── POST /deobf/slim ──────────────────────────
 app.post('/deobf/slim', rateLimit, (req, res) => {
   const extracted = extractCode(req);
-  if (!extracted || !extracted.code) {
+  const validationError = validateCode(extracted && extracted.code);
+  if (validationError) {
     return res.status(400).json({ success: false, message: '未提供代码' });
   }
   try {
@@ -254,16 +267,19 @@ app.post('/deobf/batch', rateLimit, (req, res) => {
       message: '需要 JSON body: { "items": ["code1", "code2", ...] }'
     });
   }
-  if (list.length > 20) {
+  if (list.length > MAX_BATCH_ITEMS) {
     return res.status(400).json({
       success: false,
-      message: '单次最多 20 段代码'
+      message: `单次最多 ${MAX_BATCH_ITEMS} 段代码`
     });
   }
 
   const results = list.map((item, i) => {
     if (typeof item !== 'string') {
       return { index: i, success: false, message: '非字符串项' };
+    }
+    if (item.length > MAX_CODE_LENGTH) {
+      return { index: i, success: false, message: '代码过长' };
     }
     try {
       const r = deobfuscate(item);
@@ -304,7 +320,9 @@ app.use((err, req, res, next) => {
 /* ═══════════════════════════════════════════════
  *  启动
  * ═══════════════════════════════════════════════ */
-const server = app.listen(PORT, HOST, () => {
+let server;
+function startServer() {
+  server = app.listen(PORT, HOST, () => {
   const url = `http://localhost:${PORT}`;
   console.log('──────────────────────────────────────────────');
   console.log('  10ms-deobf API 已启动');
@@ -315,7 +333,9 @@ const server = app.listen(PORT, HOST, () => {
   console.log(`  API 信息  : ${url}/api`);
   console.log(`  健康检查  : ${url}/health`);
   console.log('──────────────────────────────────────────────');
-});
+  });
+  return server;
+}
 
 // 优雅关闭
 function shutdown(signal) {
@@ -326,7 +346,12 @@ function shutdown(signal) {
   });
   setTimeout(() => process.exit(1), 5000).unref();
 }
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT',  () => shutdown('SIGINT'));
+if (require.main === module) {
+  startServer();
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT',  () => shutdown('SIGINT'));
+}
 process.on('unhandledRejection', (r) => console.error('未处理的 Promise 拒绝:', r));
 process.on('uncaughtException',  (e) => console.error('未捕获异常:', e));
+
+module.exports = { app, rateLimit, extractCode, validateCode, startServer };
