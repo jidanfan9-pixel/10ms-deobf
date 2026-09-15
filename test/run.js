@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict');
-const { deobfuscate, formatLua } = require('../deobf');
+const { deobfuscate, formatLua, detectAdvancedObfuscation } = require('../deobf');
 
 const cases = [
   {
@@ -27,4 +27,18 @@ for (const test of cases) {
 }
 
 assert.equal(deobfuscate('').success, false);
+const advanced = detectAdvancedObfuscation(`
+  local constants = { "QWxhZGRpbjpvcGVuIHNlc2FtZQ==", "0xdeadbeef" }
+  local state = 1
+  while true do
+    if state == 1 then goto next_step end
+    state = state + 1
+    ::next_step::
+  end
+  local x = string.char(65, 66)
+  local vm = opcode + register + stack + instruction + dispatch
+`);
+for (const type of ['constant-array', 'dynamic-goto', 'dynamic-string-decryption', 'vm-based-execution']) {
+  assert.ok(advanced.some(item => item.type === type), `detects ${type}`);
+}
 console.log(`Passed ${cases.length + 1} deobfuscator tests`);

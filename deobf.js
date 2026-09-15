@@ -198,6 +198,85 @@ function detectEncryption(code) {
 }
 
 /* ═══════════════════════════════════════════════
+ *  ⑤ 高级混淆模式检测
+ *  仅做静态分析，不执行输入代码。
+ * ═══════════════════════════════════════════════ */
+function detectAdvancedObfuscation(code) {
+  const patterns = [];
+  const add = (type, name, severity, confidence, desc, evidence) => {
+    patterns.push({ type, name, severity, confidence, desc, evidence });
+  };
+
+  const numericOps = (code.match(/\b(?:tonumber|bit32\.(?:bxor|band|bnot)|math\.(?:floor|mod)|string\.byte)\s*\(/g) || []).length;
+  const booleanOps = (code.match(/\b(?:true|false)\s*==?\s*[^\n;]+|\b(?:not|and|or)\s+(?:true|false)\b/g) || []).length;
+  if (numericOps + booleanOps >= 3 || /(?:0x[\da-f]+|\d+\s*[+\-*%^]\s*\d+).*(?:true|false)/is.test(code)) {
+    add('hybrid-literal', '混合字面量混淆', 'medium', 0.78,
+      '数字、布尔值或位运算被拆分为不同表达式，疑似采用多策略隐藏常量',
+      `numeric=${numericOps}, boolean=${booleanOps}`);
+  }
+
+  const gotoCount = (code.match(/\bgoto\s+[A-Za-z_]\w*|::[A-Za-z_]\w*::/g) || []).length;
+  const labelCount = (code.match(/::[A-Za-z_]\w*::/g) || []).length;
+  if (gotoCount >= 2 || (gotoCount && labelCount)) {
+    add('dynamic-goto', '动态 GOTO 模式', 'high', 0.94,
+      '检测到 goto/标签跳转，控制流可能被改造成非线性路径',
+      `jumps=${gotoCount}, labels=${labelCount}`);
+  }
+
+  const integrityChecks = /debug\.getinfo|debug\.getlocal|debug\.getupvalue|rawget\s*\(|rawequal\s*\(|string\.dump|loadstring|load\s*\(/i.test(code);
+  const hookChecks = /hookfunction|replaceclosure|checkcaller|iscclosure|newcclosure|getgc|cloneref/i.test(code);
+  if (integrityChecks || hookChecks) {
+    add('anti-tamper', '防篡改检查', 'high', 0.86,
+      '检测到调试 API、函数完整性、环境或 Hook 检测逻辑，可能在修改后触发失效',
+      [integrityChecks && 'integrity/debug', hookChecks && 'hook/environment'].filter(Boolean).join(', '));
+  }
+
+  const comments = (code.match(/--/g) || []).length;
+  const locals = (code.match(/\blocal\s+[A-Za-z_]\w*/g) || []).length;
+  const debugStrip = comments === 0 && locals === 0 && code.length > 300;
+  if (debugStrip || /debug\.setlocal|debug\.setupvalue/i.test(code)) {
+    add('metadata-stripping', '元数据剥离', 'medium', 0.72,
+      '代码缺少注释或局部变量线索，可能已移除调试元数据与可读命名',
+      `comments=${comments}, locals=${locals}`);
+  }
+
+  const stateVars = (code.match(/\b(?:state|step|idx|pc|instruction|_ENV)\s*=/gi) || []).length;
+  const dispatch = /while\s+[^\n]*do[\s\S]{0,1200}(?:if|elseif|repeat)[\s\S]{0,1200}(?:state|step|pc|instruction)/i.test(code);
+  if ((stateVars >= 2 && dispatch) || /while\s+true\s+do[\s\S]{0,800}(?:elseif|switch)/i.test(code)) {
+    add('control-flow-flattening', '控制流平坦化', 'high', 0.88,
+      '检测到状态变量驱动的 while/if 分发循环，疑似控制流平坦化',
+      `stateAssignments=${stateVars}`);
+  }
+
+  const arrayLiteral = /(?:local\s+)?[A-Za-z_]\w*\s*=\s*\{[\s\S]{20,20000}\}/i.test(code);
+  const encodedValues = (code.match(/(?:0x[\da-f]{2,}|\\x[\da-f]{2}|[A-Za-z0-9+/]{20,}={0,2})/gi) || []).length;
+  if (arrayLiteral && encodedValues >= 2) {
+    add('constant-array', '常量加密与数组化', 'high', 0.9,
+      '检测到大型常量数组与编码值，运行时可能统一解密后再使用',
+      `encodedValues=${encodedValues}`);
+  }
+
+  const vmNames = /\b(?:opcode|bytecode|instruction|dispatch|registers?|stack|vm|execute)\b/gi;
+  const vmHits = (code.match(vmNames) || []).length;
+  if (vmHits >= 5 && /while\s+/i.test(code) && /opcode|dispatch|table\.unpack|select\s*\(|setmetatable/i.test(code)) {
+    add('vm-based-execution', '基于虚拟机的执行', 'critical', 0.91,
+      '检测到 opcode/寄存器/栈/分发器等组合特征，疑似自定义 Lua VM',
+      `vmKeywords=${vmHits}`);
+  }
+
+  const stringArray = /\{[\s\S]{40,}\}/.test(code) && /(?:string\.char|frombase64|base64|decode|decrypt|xor|gsub)/i.test(code);
+  const dynamicString = /string\.char\s*\([^)]*\)|table\.concat\s*\(|string\.gsub\s*\(/gi;
+  const dynamicCount = (code.match(dynamicString) || []).length;
+  if (stringArray || dynamicCount >= 3 || /(?:decrypt|decode)\s*=.*function/i.test(code)) {
+    add('dynamic-string-decryption', '字符串加密与动态解密', 'high', 0.87,
+      '检测到编码字符串数组及运行时解码/拼接逻辑，字符串可能只在执行期间还原',
+      `dynamicStringCalls=${dynamicCount}`);
+  }
+
+  return patterns;
+}
+
+/* ═══════════════════════════════════════════════
  *  ⑥ 字符串表提取
  * ═══════════════════════════════════════════════ */
 function decodeInPlace(s) {
@@ -398,6 +477,13 @@ function deobfuscate(source) {
       if (enc.length) report.hints.encryption = enc;
     }
 
+    // ⑤ 高级混淆模式检测
+    {
+      const advanced = detectAdvancedObfuscation(code);
+      if (advanced.length) report.hints.advanced = advanced;
+      report.phases.push({ name: '高级混淆模式检测', changed: advanced.length });
+    }
+
     // ③ 注释剥离
     {
       const before = code;
@@ -478,4 +564,4 @@ function deobfuscate(source) {
   }
 }
 
-module.exports = { deobfuscate, decodeEscapes, formatLua };
+module.exports = { deobfuscate, decodeEscapes, formatLua, detectAdvancedObfuscation };
