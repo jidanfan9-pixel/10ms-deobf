@@ -485,6 +485,17 @@ function compareKnownSource(result, expected) {
 /* ═══════════════════════════════════════════════
  *  ⑥ 字符串表提取
  * ═══════════════════════════════════════════════ */
+function analyzeStaticIntegrity(code) {
+  const divisionByZero = (code.match(/\/\s*0\b/g) || []).length;
+  const moduloByZero = (code.match(/%\s*0\b/g) || []).length;
+  const unbalanced = (code.match(/\(/g) || []).length !== (code.match(/\)/g) || []).length || (code.match(/\{/g) || []).length !== (code.match(/\}/g) || []).length;
+  const warnings = [];
+  if (divisionByZero) warnings.push('检测到除零表达式；该文件可能是已损坏的中间静态输出，不应继续作为原始样本执行或解码');
+  if (moduloByZero) warnings.push('检测到模零表达式；数字折叠结果不可信');
+  if (unbalanced) warnings.push('括号或表结构不平衡；可能存在截断、粘贴损坏或过度重写');
+  return { validCandidate: warnings.length === 0, divisionByZero, moduloByZero, unbalanced, warnings };
+}
+
 function decodeInPlace(s) {
   return s
     .replace(/\\(\d{1,3})/g, (full, d) => {
@@ -795,6 +806,8 @@ function deobfuscate(source) {
 
     report.outputBytes = code.length;
     report.progress = analyzeObfuscationLayers(source, code);
+    report.integrity = analyzeStaticIntegrity(source);
+    report.warnings.push(...report.integrity.warnings);
     report.tracePlan = createTracePlan(source);
     report.vmDispatcher = analyzeVMDispatcher(source);
     report.symbolicExecution = buildSymbolicExecutionPlan(source);
@@ -830,4 +843,4 @@ function deobfuscate(source) {
   }
 }
 
-module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, evaluateConstantNumber, foldConstantPools, simplifyLuaStructures, restoreStringChar, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeVMDispatcher, buildSymbolicExecutionPlan, analyzeObfuscationLayers, createTracePlan, findCleanupSuggestions, compareKnownSource };
+module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, evaluateConstantNumber, foldConstantPools, simplifyLuaStructures, restoreStringChar, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeVMDispatcher, buildSymbolicExecutionPlan, analyzeObfuscationLayers, analyzeStaticIntegrity, createTracePlan, findCleanupSuggestions, compareKnownSource };

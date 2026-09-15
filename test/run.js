@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict');
-const { deobfuscate, formatLua, foldNumericConstants, evaluateConstantNumber, foldConstantPools, simplifyLuaStructures, restoreStringChar, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeVMDispatcher, buildSymbolicExecutionPlan, createTracePlan, compareKnownSource } = require('../deobf');
+const { deobfuscate, formatLua, foldNumericConstants, evaluateConstantNumber, foldConstantPools, simplifyLuaStructures, restoreStringChar, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeVMDispatcher, buildSymbolicExecutionPlan, analyzeStaticIntegrity, createTracePlan, compareKnownSource } = require('../deobf');
 const fs = require('node:fs');
 
 const cases = [
@@ -78,4 +78,5 @@ assert.equal(restoreStringChar('return string.char(65+0, 66)').code, 'return "AB
 const symbolic = buildSymbolicExecutionPlan('local L=1 while L do if L<2 then L=2 elseif L==2 then L=3 end end');
 assert.equal(symbolic.executable, false);
 assert.equal(symbolic.symbolicState, 'L');
+assert.equal(analyzeStaticIntegrity('local x = 1 / 0').validCandidate, false);
 console.log(`Passed ${cases.length + 1} deobfuscator tests`);
