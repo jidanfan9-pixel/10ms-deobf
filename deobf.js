@@ -251,7 +251,7 @@ function detectAdvancedObfuscation(code) {
 
   const arrayLiteral = /(?:local\s+)?[A-Za-z_]\w*\s*=\s*\{[\s\S]{20,20000}\}/i.test(code);
   const encodedValues = (code.match(/(?:0x[\da-f]{2,}|\\x[\da-f]{2}|[A-Za-z0-9+/]{20,}={0,2})/gi) || []).length;
-  if (arrayLiteral && encodedValues >= 2) {
+  if (arrayLiteral && encodedValues >= 2 && !/base64\s*=\s*\{[\s\S]*gsub/i.test(code)) {
     add('constant-array', '常量加密与数组化', 'high', 0.9,
       '检测到大型常量数组与编码值，运行时可能统一解密后再使用',
       `encodedValues=${encodedValues}`);
@@ -266,9 +266,16 @@ function detectAdvancedObfuscation(code) {
   }
 
   const stringArray = /\{[\s\S]{40,}\}/.test(code) && /(?:string\.char|frombase64|base64|decode|decrypt|xor|gsub)/i.test(code);
+  const base64Codec = /ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\+\/[\s\S]{0,1800}(?:gsub|:find)\s*\(/.test(code)
+    && /(?:%\s*2\^|2\^\s*[ife]|string\.char)/.test(code);
+  if (base64Codec) {
+    add('base64-codec', 'Base64 编解码器', 'low', 0.98,
+      '检测到标准 Base64 字母表、位拆分循环和 gsub/char 组合；这是编码模块本身，不等同于恶意字符串解密',
+      'alphabet + bit-loop + gsub/char');
+  }
   const dynamicString = /string\.char\s*\([^)]*\)|table\.concat\s*\(|string\.gsub\s*\(/gi;
   const dynamicCount = (code.match(dynamicString) || []).length;
-  if (stringArray || dynamicCount >= 3 || /(?:decrypt|decode)\s*=.*function/i.test(code)) {
+  if (!base64Codec && (stringArray || dynamicCount >= 3 || /(?:decrypt|decode)\s*=.*function/i.test(code))) {
     add('dynamic-string-decryption', '字符串加密与动态解密', 'high', 0.87,
       '检测到编码字符串数组及运行时解码/拼接逻辑，字符串可能只在执行期间还原',
       `dynamicStringCalls=${dynamicCount}`);

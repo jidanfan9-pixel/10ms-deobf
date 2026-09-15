@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const { deobfuscate, formatLua, foldNumericConstants, detectAdvancedObfuscation, analyzeVMControlFlow } = require('../deobf');
+const fs = require('node:fs');
 
 const cases = [
   {
@@ -49,4 +50,8 @@ for (const type of ['constant-array', 'dynamic-goto', 'dynamic-string-decryption
 const flow = analyzeVMControlFlow('local state=1; if state == 1 then state=2 end; if state == 2 then state=3 end');
 assert.equal(flow.detected, true);
 assert.deepEqual(flow.states, [1, 2]);
+const base64 = deobfuscate(fs.readFileSync(__dirname + '/base64-sample.lua', 'utf8'));
+assert.equal(base64.report.inputBytes > base64.report.outputBytes, true);
+assert.ok(base64.hints.advanced.some(item => item.type === 'base64-codec'));
+assert.equal(base64.hints.advanced.some(item => item.type === 'dynamic-string-decryption'), false);
 console.log(`Passed ${cases.length + 1} deobfuscator tests`);
