@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict');
-const { deobfuscate, formatLua, foldNumericConstants, simplifyLuaStructures, detectAdvancedObfuscation, analyzeVMControlFlow, createTracePlan } = require('../deobf');
+const { deobfuscate, formatLua, foldNumericConstants, evaluateConstantNumber, foldConstantPools, simplifyLuaStructures, detectAdvancedObfuscation, analyzeVMControlFlow, createTracePlan } = require('../deobf');
 const fs = require('node:fs');
 
 const cases = [
@@ -35,6 +35,9 @@ assert.equal(foldNumericConstants('local x = 426706428 % 4539430').code, 'local 
 assert.equal(foldNumericConstants('local x = -22027 - (-22028)').code, 'local x =1');
 assert.equal(foldNumericConstants('local x = 1023818 + -1023773').code, 'local x =45');
 assert.equal(foldNumericConstants('print("1+2")').code, 'print("1+2")');
+assert.equal(evaluateConstantNumber('-22027-(-22028)'), 1);
+const pool = foldConstantPools('local U = { "alpha", "beta", "gamma" }\nlocal function S(i) return U[i + 0] end\nprint(S(2))');
+assert.equal(pool.code.includes('"beta"'), true);
 const advanced = detectAdvancedObfuscation(`
   local constants = { "QWxhZGRpbjpvcGVuIHNlc2FtZQ==", "0xdeadbeef" }
   local state = 1

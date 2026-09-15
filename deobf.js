@@ -360,6 +360,68 @@ function createTracePlan(code) {
   };
 }
 
+function evaluateConstantNumber(expression) {
+  const tokens = expression.replace(/\s+/g, '').match(/-?\d+(?:\.\d+)?|[()+%*/^\-+]/g);
+  if (!tokens || tokens.join('') !== expression.replace(/\s+/g, '')) return null;
+  const values = [], operators = [];
+  const precedence = op => (op === '+' || op === '-') ? 1 : (op === '*' || op === '/' || op === '%') ? 2 : 3;
+  const apply = () => { const op = operators.pop(); const b = values.pop(); const a = values.pop(); if (a === undefined || b === undefined) throw new Error('bad expression'); if (op === '+') values.push(a + b); else if (op === '-') values.push(a - b); else if (op === '*') values.push(a * b); else if (op === '/') { if (b === 0) throw new Error('division by zero'); values.push(a / b); } else if (op === '%') { if (b === 0) throw new Error('modulo by zero'); values.push(a % b); } else if (op === '^') values.push(a ** b); };
+  let expectValue = true;
+  for (const token of tokens) {
+    if (/^-?\d/.test(token)) { values.push(Number(token)); expectValue = false; continue; }
+    if (token === '(') { operators.push(token); expectValue = true; continue; }
+    if (token === ')') { while (operators.length && operators.at(-1) !== '(') apply(); if (operators.pop() !== '(') return null; expectValue = false; continue; }
+    if (expectValue && token === '-') { values.push(0); }
+    while (operators.length && operators.at(-1) !== '(' && precedence(operators.at(-1)) >= precedence(token)) apply();
+    operators.push(token); expectValue = true;
+  }
+  while (operators.length) { if (operators.at(-1) === '(') return null; apply(); }
+  const result = values.length === 1 ? values[0] : null;
+  return Number.isSafeInteger(result) ? result : null;
+}
+
+function foldConstantPools(code) {
+  const tables = new Map();
+  const tableRe = /local\s+([A-Za-z_]\w*)\s*=\s*\{([\s\S]*?)\}/g;
+  for (const match of code.matchAll(tableRe)) {
+    const values = [];
+    const stringRe = /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g;
+    for (const item of match[2].matchAll(stringRe)) {
+      const raw = item[1];
+      values.push(raw[0] === '"' ? raw.slice(1, -1).replace(/\\([\\"'])/g, '$1') : raw.slice(1, -1).replace(/\\([\\"'])/g, '$1'));
+    }
+    if (values.length >= 3) tables.set(match[1], values);
+  }
+  const resolvers = new Map();
+  const resolverRe = /local\s+function\s+([A-Za-z_]\w*)\s*\(\s*([A-Za-z_]\w*)\s*\)\s*return\s+([A-Za-z_]\w*)\s*\[\s*\2\s*\+\s*\(?\s*(-?\d+)\s*\)?\s*\]\s*end/g;
+  for (const match of code.matchAll(resolverRe)) if (tables.has(match[3])) resolvers.set(match[1], { table: match[3], offset: Number(match[4]) });
+  let out = code;
+  let changed = 0;
+  for (const [name, resolver] of resolvers) {
+    const values = tables.get(resolver.table);
+    const callRe = new RegExp(`\\b${escapeRegExp(name)}\\s*\\(\\s*([^()]*)\\s*\\)`, 'g');
+    out = out.replace(callRe, (full, expression) => {
+      const numeric = evaluateConstantNumber(expression);
+      if (numeric === null) return full;
+      const index = numeric + resolver.offset;
+      if (index < 1 || index > values.length) return full;
+      changed++;
+      return JSON.stringify(values[index - 1]);
+    });
+  }
+  for (const [name, values] of tables) {
+    const directRe = new RegExp(`\\b${escapeRegExp(name)}\\s*\\[\\s*(-?\\d+)\\s*\\]`, 'g');
+    out = out.replace(directRe, (full, index) => {
+      const value = values[Number(index) - 1];
+      if (value === undefined) return full;
+      changed++;
+      return JSON.stringify(value);
+    });
+  }
+  if (out.length > code.length) return { code, changed: 0, tables: tables.size, resolvers: resolvers.size, skipped: 'expanded-output' };
+  return { code: out, changed, tables: tables.size, resolvers: resolvers.size, skipped: false };
+}
+
 function simplifyLuaStructures(code) {
   let out = code;
   const changes = { properties: 0, objects: 0, controlFlow: 0, deadCode: 0, expressions: 0 };
@@ -615,6 +677,13 @@ function deobfuscate(source) {
       report.phases.push({ name: '数字常量折叠', changed: r.count });
     }
 
+    // ④ 常量池查表展开：仅展开可证明为静态整数索引的访问。
+    {
+      const r = foldConstantPools(code);
+      code = r.code;
+      report.phases.push({ name: '常量池查表展开', changed: r.changed, detail: { tables: r.tables, resolvers: r.resolvers } });
+    }
+
     // ③ 安全结构简化：只改写确定性的属性、对象、常量分支和死分支。
     {
       const r = simplifyLuaStructures(code);
@@ -721,4 +790,4 @@ function deobfuscate(source) {
   }
 }
 
-module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, simplifyLuaStructures, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeObfuscationLayers, createTracePlan, findCleanupSuggestions };
+module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, evaluateConstantNumber, foldConstantPools, simplifyLuaStructures, detectAdvancedObfuscation, analyzeVMControlFlow, analyzeObfuscationLayers, createTracePlan, findCleanupSuggestions };
