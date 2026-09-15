@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict');
-const { deobfuscate, formatLua, detectAdvancedObfuscation, analyzeVMControlFlow } = require('../deobf');
+const { deobfuscate, formatLua, foldNumericConstants, detectAdvancedObfuscation, analyzeVMControlFlow } = require('../deobf');
 
 const cases = [
   {
@@ -30,6 +30,8 @@ assert.equal(deobfuscate('').success, false);
 const plain = deobfuscate('print("78")');
 assert.equal(plain.deobfuscated, 'print("78")');
 assert.equal(plain.report.outputBytes, plain.report.inputBytes);
+assert.equal(foldNumericConstants('local x = 426706428 % 4539430').code, 'local x = 8');
+assert.equal(foldNumericConstants('print("1+2")').code, 'print("1+2")');
 const advanced = detectAdvancedObfuscation(`
   local constants = { "QWxhZGRpbjpvcGVuIHNlc2FtZQ==", "0xdeadbeef" }
   local state = 1

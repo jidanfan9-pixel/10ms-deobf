@@ -75,6 +75,7 @@ function decodeEscapes(code) {
  * ═══════════════════════════════════════════════ */
 function detectObfuscator(code) {
   const signatures = [
+    { name: 'WeAreDevs',   re: /wearedevs\.net\/obfuscator/i },
     { name: 'Prometheus',  re: /prometheus|getfenv\s*\(\s*\)\s*\[|\(\s*function\s*\(\s*\)\s*return\s+getfenv/i },
     { name: 'Luraph',      re: /luraph|LPH_[0-9A-F]+/i },
     { name: 'MoonSec',     re: /moonsec|MBX_[0-9A-F]+/i },
@@ -277,22 +278,25 @@ function detectAdvancedObfuscation(code) {
 }
 
 function analyzeVMControlFlow(code) {
-  const candidates = [...code.matchAll(/\b([A-Za-z_]\w*)\s*==\s*(-?\d+)\b/g)];
-  const stateVar = candidates.length ? candidates[0][1] : null;
+  const comparisons = [...code.matchAll(/\b([A-Za-z_]\w*)\s*(?:==|~=|<=|>=|<|>)\s*(-?\d+)\b/g)];
+  const frequency = new Map();
+  for (const [, variable] of comparisons) frequency.set(variable, (frequency.get(variable) || 0) + 1);
+  const stateVar = [...frequency.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || null;
   if (!stateVar) return { detected: false, blocks: [], edges: [] };
 
+  const candidates = comparisons.filter(([, variable]) => variable === stateVar);
   const states = [...new Set(candidates.map(([, , state]) => Number(state)))];
   const edges = [];
   const assignment = new RegExp(`\\b${escapeRegExp(stateVar)}\\s*=\\s*(-?\\d+)`, 'g');
   for (const match of code.matchAll(assignment)) {
     const next = Number(match[1]);
     const before = code.slice(Math.max(0, match.index - 180), match.index);
-    const from = [...before.matchAll(new RegExp(`\\b${escapeRegExp(stateVar)}\\s*==\\s*(-?\\d+)`, 'g'))].pop();
+    const from = [...before.matchAll(new RegExp(`\\b${escapeRegExp(stateVar)}\\s*(?:==|~=|<=|>=|<|>)\\s*(-?\\d+)`, 'g'))].pop();
     edges.push({ from: from ? Number(from[1]) : null, to: next });
   }
 
   return {
-    detected: states.length >= 2 && edges.length >= 1,
+    detected: comparisons.length >= 2 && states.length >= 2 && edges.length >= 1,
     stateVariable: stateVar,
     states: states.sort((a, b) => a - b),
     blocks: states.map(state => ({ state, condition: `${stateVar} == ${state}` })),
@@ -406,6 +410,37 @@ function mergeStringConcat(code) {
   return { code, count };
 }
 
+function foldNumericConstants(code) {
+  let count = 0;
+  const strings = [];
+  const maskStrings = (value) => value.replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\[=\[[\s\S]*?\]=\])/g, (literal) => {
+    strings.push(literal);
+    return `\u0000${strings.length - 1}\u0000`;
+  });
+  const restoreStrings = (value) => value.replace(/\u0000(\d+)\u0000/g, (_, index) => strings[Number(index)]);
+  let out = maskStrings(code);
+  const re = /(?<![\w.])(-?\d+)\s*([+%*/-])\s*(-?\d+)(?![\w.])/g;
+  let previous;
+  do {
+    previous = out;
+    out = out.replace(re, (full, left, op, right) => {
+      const a = Number(left);
+      const b = Number(right);
+      let value;
+      if (op === '+') value = a + b;
+      else if (op === '-') value = a - b;
+      else if (op === '*') value = a * b;
+      else if (op === '/' && b !== 0) value = a / b;
+      else if (op === '%' && b !== 0) value = a % b;
+      else return full;
+      if (!Number.isFinite(value) || !Number.isSafeInteger(value)) return full;
+      count++;
+      return String(value);
+    });
+  } while (out !== previous && count < 100000);
+  return { code: restoreStrings(out), count };
+}
+
 /* ═══════════════════════════════════════════════
  *  ⑨ 垃圾变量重命名
  * ═══════════════════════════════════════════════ */
@@ -493,6 +528,13 @@ function deobfuscate(source) {
       code = r.code;
       const total = Object.values(r.stats).reduce((a, b) => a + b, 0);
       report.phases.push({ name: '转义解码', changed: total, detail: r.stats });
+    }
+
+    // ② 纯数字常量折叠：只计算安全整数，不执行变量或函数。
+    {
+      const r = foldNumericConstants(code);
+      code = r.code;
+      report.phases.push({ name: '数字常量折叠', changed: r.count });
     }
 
     // ② 加密检测（结构完整时执行）
@@ -590,4 +632,4 @@ function deobfuscate(source) {
   }
 }
 
-module.exports = { deobfuscate, decodeEscapes, formatLua, detectAdvancedObfuscation, analyzeVMControlFlow };
+module.exports = { deobfuscate, decodeEscapes, formatLua, foldNumericConstants, detectAdvancedObfuscation, analyzeVMControlFlow };
