@@ -1,8 +1,3 @@
-/**
- * 10ms-deobf API Server
- * 加强版：面向 Prometheus / Luraph / MoonSec / IronBrew 的 Lua 反混淆服务
- */
-
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -16,23 +11,16 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const MAX_CODE_LENGTH = Number.parseInt(process.env.MAX_CODE_LENGTH || '5000000', 10);
 const MAX_BATCH_ITEMS = Number.parseInt(process.env.MAX_BATCH_ITEMS || '20', 10);
 
-/* ═══════════════════════════════════════════════
- *  中间件
- * ═══════════════════════════════════════════════ */
-
-// CORS — 允许网页 Demo 与第三方调用
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Body 解析
 app.use(express.json({ limit: `${MAX_CODE_LENGTH}b` }));
 app.use(express.text({ type: ['text/plain', 'text/*'], limit: `${MAX_CODE_LENGTH}b` }));
 app.use(express.urlencoded({ extended: true, limit: `${MAX_CODE_LENGTH}b` }));
 
-// 请求日志
 app.use((req, res, next) => {
   const start = Date.now();
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '-';
@@ -47,7 +35,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// 简易速率限制（内存版，每分钟 60 次/IP）
 const rateStore = new Map();
 const RATE_LIMIT = 60;
 const RATE_WINDOW = 60 * 1000;
@@ -78,7 +65,6 @@ function rateLimit(req, res, next) {
   next();
 }
 
-// 定期清理速率表
 setInterval(() => {
   const now = Date.now();
   for (const [ip, entry] of rateStore.entries()) {
@@ -86,9 +72,6 @@ setInterval(() => {
   }
 }, RATE_WINDOW);
 
-/* ═══════════════════════════════════════════════
- *  静态资源 & 网页 Demo
- * ═══════════════════════════════════════════════ */
 const PUBLIC_DIR = path.join(__dirname, 'public');
 if (fs.existsSync(PUBLIC_DIR)) {
   app.use(express.static(PUBLIC_DIR, {
@@ -99,28 +82,21 @@ if (fs.existsSync(PUBLIC_DIR)) {
   console.warn('⚠ public/ 目录不存在，跳过静态资源服务');
 }
 
-/* ═══════════════════════════════════════════════
- *  工具函数
- * ═══════════════════════════════════════════════ */
 function extractCode(req) {
-  // 1) JSON body: { code: "..." }
   if (req.body && typeof req.body === 'object' && typeof req.body.code === 'string') {
     return { code: req.body.code, opts: req.body.options || {} };
   }
-  // 2) 纯文本 body
   if (typeof req.body === 'string' && req.body.length) {
     return { code: req.body, opts: {} };
   }
-  // 3) Query: ?code=...
   if (req.query && typeof req.query.code === 'string') {
     return { code: req.query.code, opts: {} };
   }
-  // 4) 自定义 header: X-Code: base64
   const b64 = req.get('X-Code-Base64');
   if (b64) {
     try {
       return { code: Buffer.from(b64, 'base64').toString('utf8'), opts: {} };
-    } catch (_) { /* 忽略 */ }
+    } catch (_) {}
   }
   return null;
 }
@@ -134,7 +110,6 @@ function validateCode(code) {
 }
 
 function slimResult(result) {
-  // 精简返回（去掉 report/hints 的详细阶段数据）
   return {
     success: result.success,
     deobfuscated: result.deobfuscated,
@@ -142,11 +117,6 @@ function slimResult(result) {
   };
 }
 
-/* ═══════════════════════════════════════════════
- *  路由
- * ═══════════════════════════════════════════════ */
-
-// ── 首页 / 健康检查 ────────────────────────────
 app.get('/', (req, res) => {
   if (fs.existsSync(path.join(PUBLIC_DIR, 'index.html'))) {
     return res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
@@ -164,7 +134,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-// ── API 元信息 ─────────────────────────────────
 function apiInfo() {
   return {
     name: '10ms-deobf',
@@ -193,7 +162,6 @@ function apiInfo() {
 
 app.get('/api', (req, res) => res.json(apiInfo()));
 
-// ── 核心：POST /deobf ─────────────────────────
 app.post('/deobf', rateLimit, (req, res) => {
   const extracted = extractCode(req);
   const validationError = validateCode(extracted && extracted.code);
@@ -214,8 +182,6 @@ app.post('/deobf', rateLimit, (req, res) => {
 
   try {
     const result = deobfuscate(extracted.code);
-
-    // ?slim=1 或 body.options.slim 时精简返回
     const slim = req.query.slim === '1' || extracted.opts.slim === true;
     return res.json(slim ? slimResult(result) : result);
   } catch (err) {
@@ -227,7 +193,6 @@ app.post('/deobf', rateLimit, (req, res) => {
   }
 });
 
-// ── GET /deobf ────────────────────────────────
 app.get('/deobf', rateLimit, (req, res) => {
   const code = req.query.code || '';
   const validationError = validateCode(code);
@@ -244,7 +209,6 @@ app.get('/deobf', rateLimit, (req, res) => {
   }
 });
 
-// ── POST /deobf/slim ──────────────────────────
 app.post('/deobf/slim', rateLimit, (req, res) => {
   const extracted = extractCode(req);
   const validationError = validateCode(extracted && extracted.code);
@@ -258,7 +222,6 @@ app.post('/deobf/slim', rateLimit, (req, res) => {
   }
 });
 
-// ── POST /deobf/batch ─────────────────────────
 app.post('/deobf/batch', rateLimit, (req, res) => {
   const list = req.body && Array.isArray(req.body.items) ? req.body.items : null;
   if (!list) {
@@ -292,9 +255,6 @@ app.post('/deobf/batch', rateLimit, (req, res) => {
   res.json({ success: true, count: results.length, results });
 });
 
-/* ═══════════════════════════════════════════════
- *  404 & 错误处理
- * ═══════════════════════════════════════════════ */
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -317,9 +277,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-/* ═══════════════════════════════════════════════
- *  启动
- * ═══════════════════════════════════════════════ */
 let server;
 function startServer() {
   server = app.listen(PORT, HOST, () => {
@@ -337,7 +294,6 @@ function startServer() {
   return server;
 }
 
-// 优雅关闭
 function shutdown(signal) {
   console.log(`\n收到 ${signal}，正在关闭...`);
   server.close(() => {
