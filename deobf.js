@@ -1,22 +1,3 @@
-/**
- * 10ms-deobf — 加强版 Lua 反混淆引擎
- * 面向 Roblox 平台：Prometheus / Luraph / MoonSec / IronBrew
- *
- * 能力概览：
- *   ① 全类型转义解码（\ddd \xHH \u{...} \uHHHH）
- *   ② 混淆器指纹识别
- *   ③ 多层包装器剥离（return (function()...end)()）
- *   ④ 加密逻辑检测（LCG / xorshift / bit32 / gsub 表）
- *   ⑤ 字符串表提取（含数字表）
- *   ⑥ string.char 还原（含 ["char"] 与别名追踪）
- *   ⑦ 字符串拼接折叠
- *   ⑧ 垃圾变量重命名
- *   ⑨ 基础格式化
- */
-
-/* ═══════════════════════════════════════════════
- *  工具
- * ═══════════════════════════════════════════════ */
 const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const LUA_KEYWORDS = new Set([
@@ -25,14 +6,10 @@ const LUA_KEYWORDS = new Set([
   'true', 'until', 'while', 'goto'
 ]);
 
-/* ═══════════════════════════════════════════════
- *  ① 转义解码
- * ═══════════════════════════════════════════════ */
 function decodeEscapes(code) {
   const stats = { decimal: 0, hex: 0, unicode: 0, brace: 0 };
   let out = code;
 
-  // Lua 常用短转义，放在数值转义之前，避免误伤已解码内容。
   const shortEscapes = { n: '\n', r: '\r', t: '\t', b: '\b', f: '\f', v: '\v', a: '\x07' };
   out = out.replace(/\\([nrtbfva\\"'])/g, (full, key) => {
     if (key === '\\' || key === '"' || key === "'") return key;
@@ -57,7 +34,6 @@ function decodeEscapes(code) {
     return String.fromCharCode(parseInt(h, 16));
   });
 
-  // \ddd （十进制，≤255）
   out = out.replace(/\\(\d{1,3})/g, (full, d) => {
     const n = parseInt(d, 10);
     if (n <= 255) {
@@ -70,9 +46,6 @@ function decodeEscapes(code) {
   return { code: out, stats };
 }
 
-/* ═══════════════════════════════════════════════
- *  ② 混淆器指纹识别
- * ═══════════════════════════════════════════════ */
 function detectObfuscator(code) {
   const signatures = [
     { name: 'WeAreDevs',   re: /wearedevs\.net\/obfuscator/i },
@@ -89,13 +62,8 @@ function detectObfuscator(code) {
   return null;
 }
 
-/* ═══════════════════════════════════════════════
- *  ③ 注释剥离
- * ═══════════════════════════════════════════════ */
 function stripComments(code) {
-  // 长块注释 --[[ ... ]] / --[==[ ... ]==]
   let out = code.replace(/--\[(=*)\[[\s\S]*?\]\1\]/g, '');
-  // 混淆器特征单行注释
   out = out.replace(
     /--[^\n]*(?:prometheus|obfuscator|luraph|moonsec|ironbrew|aztup|https?:\/\/|discord\.gg)[^\n]*/gi,
     ''
@@ -103,9 +71,6 @@ function stripComments(code) {
   return out;
 }
 
-/* ═══════════════════════════════════════════════
- *  ④ 包装器剥离
- * ═══════════════════════════════════════════════ */
 function stripWrappers(code) {
   let layers = 0;
   let out = code.trim();
@@ -143,9 +108,6 @@ function stripWrappers(code) {
   return { code: out, layers };
 }
 
-/* ═══════════════════════════════════════════════
- *  ⑤ 加密逻辑检测
- * ═══════════════════════════════════════════════ */
 function detectEncryption(code) {
   const findings = [];
 
@@ -198,10 +160,6 @@ function detectEncryption(code) {
   return findings;
 }
 
-/* ═══════════════════════════════════════════════
- *  ⑤ 高级混淆模式检测
- *  仅做静态分析，不执行输入代码。
- * ═══════════════════════════════════════════════ */
 function detectAdvancedObfuscation(code) {
   const patterns = [];
   const add = (type, name, severity, confidence, desc, evidence) => {
