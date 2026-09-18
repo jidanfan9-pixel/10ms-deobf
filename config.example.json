@@ -1,0 +1,8 @@
+{
+  "DISCORD_TOKEN": "",
+  "DISCORD_CLIENT_ID": "",
+  "DISCORD_GUILD_ID": "",
+  "DEOBF_API_URL": "http://127.0.0.1:3000/deobf",
+  "BOT_NAME": "斯大林",
+  "MAX_CODE_LENGTH": "5000000"
+}

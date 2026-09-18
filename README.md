@@ -35,3 +35,16 @@ curl -X POST http://localhost:3000/deobf \
 ## 安全提示
 
 Discord Bot Token 等同于密码。若曾经在聊天、日志或截图中暴露，应在 Developer Portal 立即重置，并只通过环境变量注入新 Token。
+
+## Python Bot JSON 配置
+
+复制 `config.example.json` 为 `config.json`。Python bot 会自动读取同目录的 `config.json`，环境变量优先级更高：
+
+```bash
+cp config.example.json config.json
+# 编辑 config.json，填写 DISCORD_TOKEN 和 DISCORD_CLIENT_ID
+pip install -r requirements.txt
+python discord_bot.py
+```
+
+不要把真实 Token 写入 Git；`config.json` 已加入 `.gitignore`。也可以通过 `DEOBF_CONFIG=/path/to/config.json` 指定配置文件位置。

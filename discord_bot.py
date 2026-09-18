@@ -3,22 +3,35 @@ import json
 import os
 import urllib.error
 import urllib.request
+from pathlib import Path
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN", "").strip()
-DISCORD_CLIENT_ID = os.getenv("DISCORD_CLIENT_ID", "").strip()
-DISCORD_GUILD_ID = os.getenv("DISCORD_GUILD_ID", "").strip()
-DEOBF_API_URL = os.getenv("DEOBF_API_URL", "http://127.0.0.1:3000/deobf").strip()
-BOT_NAME = os.getenv("BOT_NAME", "斯大林")
-MAX_CODE_LENGTH = int(os.getenv("MAX_CODE_LENGTH", "5000000"))
+CONFIG_FILE = Path(os.getenv("DEOBF_CONFIG", "config.json"))
+try:
+    CONFIG = json.loads(CONFIG_FILE.read_text(encoding="utf-8")) if CONFIG_FILE.exists() else {}
+except json.JSONDecodeError as error:
+    raise SystemExit(f"JSON 配置文件格式错误：{CONFIG_FILE}：{error}") from error
+
+
+def setting(name: str, default: str = "") -> str:
+    """Environment variables override config.json values."""
+    return os.getenv(name, str(CONFIG.get(name, default))).strip()
+
+
+DISCORD_TOKEN = setting("DISCORD_TOKEN")
+DISCORD_CLIENT_ID = setting("DISCORD_CLIENT_ID")
+DISCORD_GUILD_ID = setting("DISCORD_GUILD_ID")
+DEOBF_API_URL = setting("DEOBF_API_URL", "http://127.0.0.1:3000/deobf")
+BOT_NAME = setting("BOT_NAME", "斯大林")
+MAX_CODE_LENGTH = int(setting("MAX_CODE_LENGTH", "5000000"))
 MAX_OUTPUT_MESSAGE_LENGTH = 1700
 
 if not DISCORD_TOKEN:
     raise SystemExit(
-        "缺少 DISCORD_TOKEN。请在 py4 的环境变量中设置它，不要把 Token 写进脚本。"
+        "缺少 DISCORD_TOKEN。请在 py4 的环境变量中设置它；不要把真实 Token 写进脚本或 config.json。"
     )
 if not DISCORD_CLIENT_ID:
     raise SystemExit("缺少 DISCORD_CLIENT_ID，请填写 Discord Developer Portal 的 Application ID。")
