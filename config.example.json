@@ -2,7 +2,9 @@
   "DISCORD_TOKEN": "",
   "DISCORD_CLIENT_ID": "",
   "DISCORD_GUILD_ID": "",
+  "ADMIN_USER_IDS": "你的Discord用户ID",
   "DEOBF_API_URL": "http://127.0.0.1:3000/deobf",
   "BOT_NAME": "斯大林",
-  "MAX_CODE_LENGTH": "5000000"
+  "MAX_CODE_LENGTH": "5000000",
+  "BOT_RESTART_DELAY": "5"
 }

@@ -48,3 +48,53 @@ python discord_bot.py
 ```
 
 不要把真实 Token 写入 Git；`config.json` 已加入 `.gitignore`。也可以通过 `DEOBF_CONFIG=/path/to/config.json` 指定配置文件位置。
+
+## 长时间托管与控制
+
+### 配置管理员
+
+在 `config.json` 中填写你的 Discord 用户 ID：
+
+```json
+"ADMIN_USER_IDS": "123456789012345678"
+```
+
+多个管理员用英文逗号分隔。只有这些用户可以执行托管控制命令。
+
+### 新增命令
+
+- `/deobf`：上传任意 Lua/Luau 文本文件，不限制 `.lua`、`.luau`、`.txt` 扩展名；长结果会作为 `原文件名.deobfuscated.lua` 下载。
+- `/status`：查看运行状态、API、PID 和管理员数量。
+- `/settings`：查看当前设置，不显示 Token。
+- `/stop`：向 Discord 回复后立即关闭当前 bot 进程。
+- `/ping`：检查在线状态。
+
+### 持续运行一星期或更久
+
+不要直接运行 `python discord_bot.py`，使用自动重启启动器：
+
+```bash
+python run_bot.py
+```
+
+启动器会在 bot 意外崩溃或网络异常退出后自动重启，因此可以长期运行。请把它放在不会休眠、不会自动清理进程的 VPS、云主机或持续运行的电脑上。关闭 py4 软件本身是否会继续运行，取决于 py4 是否提供后台托管；普通桌面进程退出后，Python 进程通常也会结束。
+
+### 关于立即停止和重新开启
+
+`/stop` 会立即关闭 bot。进程关闭后无法再接收 Discord 指令，因此不能靠 Discord 中的 `/start` 重新打开。重新开启方式是重新运行：
+
+```bash
+python run_bot.py
+```
+
+如果希望 `/stop` 只暂停处理、但仍保留 Discord 在线状态，可以改成“暂停模式”；这样 `/start` 才能在 Discord 内生效。当前版本按你的要求采用真正关闭进程的方式。
+
+### Windows / py4 长期运行建议
+
+如果 py4 支持后台任务或守护运行，请把启动命令设置为：
+
+```bash
+python run_bot.py
+```
+
+如果它只支持单次脚本运行，则退出软件后无法保证 bot 继续托管，需要使用 VPS、系统服务或 py4 自带的持久托管功能。
